@@ -6,7 +6,7 @@
     <title>SWK FishScales - ผู้นำนวัตกรรมเกล็ดปลาคุณภาพระดับสากล</title>
     
     <!-- Google Fonts: Prompt for modern Thai typography -->
-    <link rel="preconnect" href="https://drive.google.com/file/d/1QE-KPcN9AocNgG_FJ0nu8lLzCqhWW7In/view?usp=sharing">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -15,6 +15,217 @@
     
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(new URLSearchParams(window.location.search).get('firebase_config') || '{}');
+        // Fallback for demo if config missing (Mock mode logic handled in code)
+        // In real Canvas environment, __firebase_config is injected.
+        
+        let app, auth, db, user;
+        const appId = 'swk-fishscales-v1'; // App ID for path
+        
+        try {
+            // Check if global config exists (in Canvas environment)
+            if (typeof __firebase_config !== 'undefined') {
+                app = initializeApp(JSON.parse(__firebase_config));
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // Auth Flow
+                signInAnonymously(auth).catch(error => console.error("Auth Error:", error));
+                
+                onAuthStateChanged(auth, (u) => {
+                    if (u) {
+                        user = u;
+                        console.log("Connected to database");
+                        initRealtimeListener();
+                    }
+                });
+            }
+        } catch (e) {
+            console.log("Firebase not initialized (Offline Mode)");
+        }
+
+        // --- Data Handling ---
+        
+        // Default Images (Fallback)
+        const defaultContent = {
+            'hero-bg': 'https://drive.google.com/uc?export=view&id=1QE-KPcN9AocNgG_FJ0nu8lLzCqhWW7In',
+            'product-1': 'https://images.unsplash.com/photo-1522778526097-ce0a22ce718d?q=80&w=2070&auto=format&fit=crop',
+            'product-2': 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1887&auto=format&fit=crop',
+            'product-3': 'https://images.unsplash.com/photo-1599423300746-b62507ac9741?q=80&w=1964&auto=format&fit=crop',
+            'gallery-1': 'https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop',
+            'gallery-2': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop',
+            'gallery-3': 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop',
+            'gallery-4': 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop',
+            'gallery-5': 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032&auto=format&fit=crop',
+            'gallery-6': 'https://images.unsplash.com/photo-1628194411442-76342898950d?q=80&w=1974&auto=format&fit=crop',
+            'standard-1': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop',
+            'standard-2': 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=2080&auto=format&fit=crop',
+            'standard-3': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop'
+        };
+
+        // Listen for updates
+        function initRealtimeListener() {
+            if (!user || !db) return;
+            // Use specific path for public data
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'site_content');
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    applyContent(data);
+                } else {
+                    // Initialize if not exists (Optional, mostly handled by defaults)
+                }
+            }, (error) => {
+                console.error("Error fetching data:", error);
+            });
+        }
+
+        // Apply content to DOM
+        function applyContent(data) {
+            Object.keys(data).forEach(key => {
+                const element = document.querySelector(`[data-editable-id="${key}"]`);
+                if (element) {
+                    if (element.tagName === 'IMG') {
+                        element.src = data[key];
+                    } else {
+                        // For background images like hero
+                        element.style.backgroundImage = key === 'hero-bg' ? 
+                            `linear-gradient(to right, rgba(12, 74, 110, 0.9), rgba(12, 74, 110, 0.6)), url('${data[key]}')` : 
+                            `url('${data[key]}')`;
+                    }
+                }
+            });
+        }
+
+        // --- Admin Functions ---
+        window.isAdmin = false;
+
+        window.adminLogin = function() {
+            const password = document.getElementById('admin-password').value;
+            // Simple hardcoded check for demo purposes
+            if (password === 'admin123') {
+                window.isAdmin = true;
+                document.getElementById('loginModal').classList.add('hidden');
+                enableEditMode();
+                showToast('เข้าสู่ระบบผู้ดูแลเรียบร้อย', 'success');
+            } else {
+                showToast('รหัสผ่านไม่ถูกต้อง', 'error');
+            }
+        };
+
+        function enableEditMode() {
+            document.body.classList.add('admin-mode');
+            const editableElements = document.querySelectorAll('[data-editable-id]');
+            
+            editableElements.forEach(el => {
+                // Create Edit Button overlay
+                const wrapper = document.createElement('div');
+                wrapper.className = 'edit-overlay absolute top-2 right-2 z-50 cursor-pointer bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-brand-500 hover:text-white transition transform hover:scale-110';
+                wrapper.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
+                wrapper.onclick = (e) => {
+                    e.stopPropagation(); // Prevent triggering parent clicks (like lightbox)
+                    e.preventDefault();
+                    openEditModal(el.dataset.editableId);
+                };
+                
+                // Find parent to append relative overlay
+                let parent = el.parentElement;
+                // Special handling for Hero section which is not wrapped tightly
+                if (el.id === 'home') {
+                    // For hero, we append to the section itself
+                    el.appendChild(wrapper);
+                } else {
+                    parent.style.position = 'relative';
+                    parent.appendChild(wrapper);
+                }
+            });
+            
+            // Change Admin Button to Logout
+            const adminBtn = document.getElementById('admin-btn-text');
+            if(adminBtn) adminBtn.innerText = "ออกจากระบบ";
+            document.getElementById('admin-btn-container').onclick = window.adminLogout;
+        }
+
+        window.adminLogout = function() {
+            window.isAdmin = false;
+            document.body.classList.remove('admin-mode');
+            document.querySelectorAll('.edit-overlay').forEach(el => el.remove());
+            
+             // Change Button back to Login
+            const adminBtn = document.getElementById('admin-btn-text');
+            if(adminBtn) adminBtn.innerText = "ผู้ดูแลระบบ";
+            document.getElementById('admin-btn-container').onclick = () => document.getElementById('loginModal').classList.remove('hidden');
+            
+            showToast('ออกจากระบบแล้ว', 'neutral');
+        }
+
+        window.openEditModal = function(id) {
+            document.getElementById('editTargetId').value = id;
+            document.getElementById('editModal').classList.remove('hidden');
+        };
+
+        window.saveImage = async function() {
+            if (!user || !db) {
+                // Fallback for offline/no-firebase demo
+                const id = document.getElementById('editTargetId').value;
+                const url = document.getElementById('newImageUrl').value;
+                if(url) {
+                   const dummyData = {};
+                   dummyData[id] = url;
+                   applyContent(dummyData);
+                   document.getElementById('editModal').classList.add('hidden');
+                   showToast('บันทึก (โหมดจำลอง) เรียบร้อย', 'success');
+                }
+                return;
+            }
+
+            const id = document.getElementById('editTargetId').value;
+            const url = document.getElementById('newImageUrl').value;
+            
+            if (!url) return;
+
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'site_content');
+            
+            try {
+                // We need to merge with existing data, simpler to just set with merge:true
+                await setDoc(docRef, { [id]: url }, { merge: true });
+                document.getElementById('editModal').classList.add('hidden');
+                document.getElementById('newImageUrl').value = ''; // clear input
+                showToast('บันทึกข้อมูลสำเร็จ!', 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('เกิดข้อผิดพลาดในการบันทึก', 'error');
+            }
+        };
+
+        // Helper Toast
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                neutral: 'bg-gray-600'
+            };
+            toast.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 ${colors[type]} text-white px-6 py-3 rounded-full shadow-xl z-[200] fade-in-up`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info mr-2"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // Initial Application (Apply defaults first to prevent empty spaces)
+        applyContent(defaultContent);
+
+    </script>
 
     <script>
         tailwind.config = {
@@ -49,14 +260,11 @@
         
         /* Animations */
         .fade-in-up {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            animation: fadeInUp 0.5s ease-out forwards;
         }
-        
-        .fade-in-up.visible {
-            opacity: 1;
-            transform: translateY(0);
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .gradient-text {
@@ -65,12 +273,13 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Hero Overlay */
+        /* Hero Overlay - Note: Actual Image loaded via JS now */
         .hero-bg {
-            background-image: linear-gradient(to right, rgba(12, 74, 110, 0.9), rgba(12, 74, 110, 0.6)), url('https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=2000&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            /* Default fallback in CSS */
+            background-image: linear-gradient(to right, rgba(12, 74, 110, 0.9), rgba(12, 74, 110, 0.6)), url('https://drive.google.com/uc?export=view&id=1QE-KPcN9AocNgG_FJ0nu8lLzCqhWW7In');
         }
 
         /* Parallax Section */
@@ -128,6 +337,11 @@
         /* Gallery Overlay */
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
+        }
+
+        /* Admin Mode Styles */
+        .admin-mode .gallery-item, .admin-mode .relative {
+            border: 2px dashed #0ea5e9;
         }
     </style>
 </head>
@@ -190,8 +404,8 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="relative min-h-[100dvh] flex items-center hero-bg overflow-hidden">
+    <!-- Hero Section (Editable ID added) -->
+    <section id="home" class="relative min-h-[100dvh] flex items-center hero-bg overflow-hidden" data-editable-id="hero-bg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-20 pb-20">
             <div class="md:w-2/3 fade-in-up">
                 <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight mb-6 drop-shadow-lg">
@@ -234,13 +448,13 @@
                         <!-- Images -->
                         <div id="standards-carousel" class="w-full h-full relative">
                             <!-- Image 1 -->
-                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100" data-index="0" alt="Lab Testing">
+                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100" data-index="0" alt="Lab Testing" data-editable-id="standard-1">
                             
                             <!-- Image 2 -->
-                            <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=2080&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="1" alt="Microscope Analysis">
+                            <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=2080&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="1" alt="Microscope Analysis" data-editable-id="standard-2">
                             
                             <!-- Image 3 -->
-                            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="2" alt="Quality Control">
+                            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="2" alt="Quality Control" data-editable-id="standard-3">
                         </div>
 
                         <!-- Navigation Controls -->
@@ -298,7 +512,7 @@
                 <div class="bg-brand-800 rounded-2xl overflow-hidden group hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 fade-in-up border border-brand-700/50">
                     <div class="h-56 overflow-hidden relative">
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1522778526097-ce0a22ce718d?q=80&w=2070&auto=format&fit=crop" alt="Dried Fish Scales" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                        <img src="https://images.unsplash.com/photo-1522778526097-ce0a22ce718d?q=80&w=2070&auto=format&fit=crop" alt="Dried Fish Scales" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" data-editable-id="product-1">
                     </div>
                     <div class="p-8 relative z-20 bg-brand-800">
                         <h4 class="text-xl font-bold mb-3 group-hover:text-brand-400 transition">เกล็ดปลาแห้ง (Dried Scales)</h4>
@@ -314,7 +528,7 @@
                 <div class="bg-brand-800 rounded-2xl overflow-hidden group hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 fade-in-up border border-brand-700/50" style="transition-delay: 100ms;">
                     <div class="h-56 overflow-hidden relative">
                          <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1887&auto=format&fit=crop" alt="Decalcified Scales" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                        <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1887&auto=format&fit=crop" alt="Decalcified Scales" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" data-editable-id="product-2">
                     </div>
                     <div class="p-8 relative z-20 bg-brand-800">
                         <h4 class="text-xl font-bold mb-3 group-hover:text-brand-400 transition">เกล็ดปลาขจัดแคลเซียม (Ossein)</h4>
@@ -330,7 +544,7 @@
                 <div class="bg-brand-800 rounded-2xl overflow-hidden group hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 fade-in-up border border-brand-700/50" style="transition-delay: 200ms;">
                     <div class="h-56 overflow-hidden relative">
                          <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1599423300746-b62507ac9741?q=80&w=1964&auto=format&fit=crop" alt="Collagen Peptide" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                        <img src="https://images.unsplash.com/photo-1599423300746-b62507ac9741?q=80&w=1964&auto=format&fit=crop" alt="Collagen Peptide" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" data-editable-id="product-3">
                     </div>
                     <div class="p-8 relative z-20 bg-brand-800">
                         <h4 class="text-xl font-bold mb-3 group-hover:text-brand-400 transition">คอลลาเจน เปปไทด์ (OEM)</h4>
@@ -357,7 +571,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 fade-in-up">
                 <!-- Gallery Item 1 -->
                 <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop')">
-                    <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" data-editable-id="gallery-1">
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
                         <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
                         <span class="font-medium">กระบวนการผลิต</span>
@@ -366,7 +580,7 @@
 
                 <!-- Gallery Item 2 -->
                 <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop')">
-                    <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" data-editable-id="gallery-2">
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
                         <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
                         <span class="font-medium">ห้องปฏิบัติการตรวจสอบ</span>
@@ -375,7 +589,7 @@
 
                 <!-- Gallery Item 3 -->
                 <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop')">
-                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" data-editable-id="gallery-3">
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
                         <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
                         <span class="font-medium">คลังสินค้า</span>
@@ -384,7 +598,7 @@
 
                 <!-- Gallery Item 4 -->
                 <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop')">
-                    <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" data-editable-id="gallery-4">
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
                         <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
                         <span class="font-medium">การส่งออกสินค้า</span>
@@ -393,7 +607,7 @@
 
                 <!-- Gallery Item 5 -->
                 <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032&auto=format&fit=crop')">
-                    <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" data-editable-id="gallery-5">
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
                         <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
                         <span class="font-medium">การประชุมคู่ค้า</span>
@@ -402,7 +616,7 @@
 
                  <!-- Gallery Item 6 -->
                  <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1628194411442-76342898950d?q=80&w=1974&auto=format&fit=crop')">
-                    <img src="https://images.unsplash.com/photo-1628194411442-76342898950d?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                    <img src="https://images.unsplash.com/photo-1628194411442-76342898950d?q=80&w=1974&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500" data-editable-id="gallery-6">
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white">
                         <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
                         <span class="font-medium">วัตถุดิบคุณภาพสูง</span>
@@ -584,8 +798,14 @@
                     </div>
                 </div>
             </div>
-            <div class="border-t border-gray-800 pt-8 text-center text-sm">
-                <p>&copy; 2024 SWK FishScales Co., Ltd. All rights reserved.</p>
+            
+            <!-- Admin Login Button Area -->
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
+                <p class="mb-2 md:mb-0">&copy; 2024 SWK FishScales Co., Ltd. All rights reserved.</p>
+                <button id="admin-btn-container" onclick="document.getElementById('loginModal').classList.remove('hidden')" class="flex items-center gap-2 text-gray-500 hover:text-brand-500 transition cursor-pointer">
+                    <i class="fa-solid fa-lock"></i>
+                    <span id="admin-btn-text">ผู้ดูแลระบบ</span>
+                </button>
             </div>
         </div>
     </footer>
@@ -595,10 +815,42 @@
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
-    <!-- Lightbox Modal (New Feature) -->
+    <!-- Lightbox Modal -->
     <div id="lightbox" class="fixed inset-0 z-[100] hidden bg-black/90 flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300" onclick="closeLightbox()">
         <button class="absolute top-6 right-6 text-white text-5xl hover:text-gray-300 focus:outline-none z-[101]">&times;</button>
         <img id="lightbox-img" src="" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Login Modal (New) -->
+    <div id="loginModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm mx-4 w-full animate-bounce-in">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">เข้าสู่ระบบผู้ดูแล</h3>
+            <div class="mb-4 text-left">
+                <label class="block text-sm text-gray-600 mb-1">รหัสผ่าน</label>
+                <input type="password" id="admin-password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Enter Password">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">ยกเลิก</button>
+                <button onclick="adminLogin()" class="flex-1 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Image Modal (New) -->
+    <div id="editModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4 w-full animate-bounce-in">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">แก้ไขรูปภาพ</h3>
+            <input type="hidden" id="editTargetId">
+            <div class="mb-6 text-left">
+                <label class="block text-sm text-gray-600 mb-1">ลิงก์รูปภาพใหม่ (URL)</label>
+                <input type="text" id="newImageUrl" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="https://example.com/image.jpg">
+                <p class="text-xs text-gray-500 mt-1">แนะนำให้ใช้ลิงก์จาก Google Drive หรือเว็บไซต์ฝากรูป</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('editModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">ยกเลิก</button>
+                <button onclick="saveImage()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">บันทึก</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -701,14 +953,12 @@
             }
         }
 
-        // --- 6. Form Submission Logic (Removed) ---
-        // ฟังก์ชันนี้ไม่ได้ใช้แล้ว แต่เก็บไว้เผื่อขยายผลในอนาคต หรือสามารถลบออกได้
-        // function showSuccess() {
-        //    document.getElementById('successModal').classList.remove('hidden');
-        // }
-
-        // --- 7. Lightbox Logic (New Feature) ---
+        // --- 6. Lightbox Logic ---
         function openLightbox(src) {
+            // Check if user clicked the edit overlay, if so do NOT open lightbox
+            // This is handled by event.stopPropagation in the overlay click handler,
+            // but just in case, we do nothing extra here.
+            
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightbox-img');
             
@@ -739,7 +989,7 @@
             }, 300);
         }
 
-        // --- 8. Standards Carousel Logic (New Feature) ---
+        // --- 7. Standards Carousel Logic ---
         let currentStandardSlide = 0;
         const standardSlides = document.querySelectorAll('#standards-carousel img');
         const standardDots = document.querySelectorAll('.standard-dot');
@@ -789,4 +1039,3 @@
     </script>
 </body>
 </html>
-
