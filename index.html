@@ -21,12 +21,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const firebaseConfig = JSON.parse(new URLSearchParams(window.location.search).get('firebase_config') || '{}');
-        // Fallback for demo if config missing (Mock mode logic handled in code)
-        // In real Canvas environment, __firebase_config is injected.
         
-        let app, auth, db, user;
+        let app, auth, db, storage, user;
         const appId = 'swk-fishscales-v1'; // App ID for path
         
         try {
@@ -35,6 +34,7 @@
                 app = initializeApp(JSON.parse(__firebase_config));
                 auth = getAuth(app);
                 db = getFirestore(app);
+                storage = getStorage(app);
                 
                 // Auth Flow
                 signInAnonymously(auth).catch(error => console.error("Auth Error:", error));
@@ -169,40 +169,83 @@
 
         window.openEditModal = function(id) {
             document.getElementById('editTargetId').value = id;
+            document.getElementById('fileNameDisplay').innerText = ''; // Reset filename
+            document.getElementById('newImageFile').value = ''; // Reset file input
             document.getElementById('editModal').classList.remove('hidden');
         };
 
+        // File Input Change Listener for displaying filename
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('newImageFile');
+            if(fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    const fileName = e.target.files[0]?.name;
+                    document.getElementById('fileNameDisplay').innerText = fileName ? `เลือกไฟล์: ${fileName}` : '';
+                });
+            }
+        });
+
         window.saveImage = async function() {
-            if (!user || !db) {
-                // Fallback for offline/no-firebase demo
-                const id = document.getElementById('editTargetId').value;
-                const url = document.getElementById('newImageUrl').value;
-                if(url) {
-                   const dummyData = {};
-                   dummyData[id] = url;
-                   applyContent(dummyData);
-                   document.getElementById('editModal').classList.add('hidden');
-                   showToast('บันทึก (โหมดจำลอง) เรียบร้อย', 'success');
-                }
+            const id = document.getElementById('editTargetId').value;
+            const fileInput = document.getElementById('newImageFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showToast('กรุณาเลือกไฟล์รูปภาพ', 'error');
                 return;
             }
 
-            const id = document.getElementById('editTargetId').value;
-            const url = document.getElementById('newImageUrl').value;
-            
-            if (!url) return;
+            // Fallback for offline/no-firebase demo
+            if (!user || !db || !storage) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dummyData = {};
+                    dummyData[id] = e.target.result; // Base64 for local display
+                    applyContent(dummyData);
+                    document.getElementById('editModal').classList.add('hidden');
+                    showToast('บันทึก (โหมดจำลอง) เรียบร้อย', 'success');
+                }
+                reader.readAsDataURL(file);
+                return;
+            }
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'site_content');
-            
+            // Real Cloud Storage Upload
             try {
-                // We need to merge with existing data, simpler to just set with merge:true
+                // Show loading state
+                const saveBtn = document.getElementById('saveBtn');
+                const originalText = saveBtn.innerText;
+                saveBtn.innerText = 'กำลังอัปโหลด...';
+                saveBtn.disabled = true;
+                saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                // 1. Upload File
+                const storageRef = ref(storage, `public/images/${Date.now()}_${file.name}`);
+                await uploadBytes(storageRef, file);
+                
+                // 2. Get URL
+                const url = await getDownloadURL(storageRef);
+
+                // 3. Save URL to Firestore
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'site_content');
                 await setDoc(docRef, { [id]: url }, { merge: true });
+                
+                // Reset UI
                 document.getElementById('editModal').classList.add('hidden');
-                document.getElementById('newImageUrl').value = ''; // clear input
-                showToast('บันทึกข้อมูลสำเร็จ!', 'success');
+                fileInput.value = '';
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                showToast('อัปโหลดและบันทึกสำเร็จ!', 'success');
             } catch (e) {
                 console.error(e);
-                showToast('เกิดข้อผิดพลาดในการบันทึก', 'error');
+                showToast('เกิดข้อผิดพลาดในการอัปโหลด', 'error');
+                
+                // Reset UI on error
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.innerText = 'บันทึก';
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         };
 
@@ -842,13 +885,22 @@
             <h3 class="text-xl font-bold text-gray-900 mb-4">แก้ไขรูปภาพ</h3>
             <input type="hidden" id="editTargetId">
             <div class="mb-6 text-left">
-                <label class="block text-sm text-gray-600 mb-1">ลิงก์รูปภาพใหม่ (URL)</label>
-                <input type="text" id="newImageUrl" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" placeholder="https://example.com/image.jpg">
-                <p class="text-xs text-gray-500 mt-1">แนะนำให้ใช้ลิงก์จาก Google Drive หรือเว็บไซต์ฝากรูป</p>
+                <label class="block text-sm text-gray-600 mb-1">เลือกรูปภาพใหม่</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="newImageFile" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fa-solid fa-cloud-arrow-up text-gray-400 text-3xl mb-2"></i>
+                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">คลิกเพื่ออัปโหลด</span></p>
+                            <p class="text-xs text-gray-500">PNG, JPG (Max 5MB)</p>
+                        </div>
+                        <input id="newImageFile" type="file" accept="image/*" class="hidden" />
+                    </label>
+                </div>
+                <div id="fileNameDisplay" class="text-xs text-brand-600 mt-2 text-center h-4"></div>
             </div>
             <div class="flex gap-2">
                 <button onclick="document.getElementById('editModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">ยกเลิก</button>
-                <button onclick="saveImage()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">บันทึก</button>
+                <button id="saveBtn" onclick="saveImage()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">บันทึก</button>
             </div>
         </div>
     </div>
