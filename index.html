@@ -189,10 +189,13 @@
     <!-- Hero Section (Updated with Animated Background) -->
     <section id="home" class="relative min-h-[100dvh] flex items-center overflow-hidden">
         
+        <!-- ================= [1] จุดแสดงภาพพื้นหลังเคลื่อนไหว (Hero Background) ================= -->
         <!-- Animated Background Layer -->
         <div class="hero-bg-container">
+            <!-- ภาพพื้นหลังจะถูกกำหนดใน CSS class .hero-bg-image -->
             <div class="hero-bg-image animate-pan-slow"></div>
         </div>
+        <!-- =================================================================================== -->
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-28 pb-20">
             <div class="md:w-3/4 fade-in-up">
@@ -239,6 +242,7 @@
                 <div class="md:w-1/2 fade-in-up relative group">
                     <div class="absolute inset-0 bg-brand-500 rounded-2xl transform rotate-3 transition-transform group-hover:rotate-6 opacity-20"></div>
                     <div class="relative rounded-2xl shadow-2xl overflow-hidden h-[400px] w-full bg-gray-100 group-hover:scale-[1.01] transition-transform duration-500">
+                        <!-- ================= [2] จุดแสดงภาพสไลด์มาตรฐาน (Standards Slide) ================= -->
                         <div id="standards-carousel" class="w-full h-full relative">
                             <!-- Modified: Replaced image with new pic.in.th link -->
                             <!-- Note: If the image does not load, please ensure you are using the 'Direct Link' (ending in .jpg or .png) from the image host site -->
@@ -246,6 +250,7 @@
                             <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=2080&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="1" alt="Microscope Analysis">
                             <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="2" alt="Quality Control">
                         </div>
+                        <!-- ================================================================================ -->
                         <button onclick="changeStandardSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-brand-600/80 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 group/btn">
                             <i class="fa-solid fa-chevron-left group-hover/btn:-translate-x-0.5 transition-transform"></i>
                         </button>
@@ -287,6 +292,7 @@
                 <h2 class="text-brand-500 font-bold tracking-wide uppercase text-sm mb-2">Our Products</h2>
                 <h3 class="text-3xl md:text-4xl font-bold text-white">ผลิตภัณฑ์เกล็ดปลาคุณภาพสูง</h3>
             </div>
+            <!-- ================= [3] จุดแสดงภาพสินค้า (Products Images) ================= -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="bg-brand-800 rounded-2xl overflow-hidden group hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 fade-in-up border border-brand-700/50">
                     <div class="h-56 overflow-hidden relative">
@@ -319,6 +325,7 @@
                     </div>
                 </div>
             </div>
+            <!-- ========================================================================== -->
         </div>
     </section>
 
@@ -329,6 +336,7 @@
                 <h2 class="text-brand-600 font-bold tracking-wide uppercase text-sm mb-2">Portfolio</h2>
                 <h3 class="text-3xl font-bold text-gray-900">ภาพความสำเร็จและผลงานของเรา</h3>
             </div>
+            <!-- ================= [4] จุดแสดงภาพผลงาน (Gallery Images) ================= -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 fade-in-up">
                 <div class="gallery-item relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 group" onclick="openLightbox('https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop')">
                     <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
@@ -355,6 +363,7 @@
                     <div class="gallery-overlay absolute inset-0 bg-brand-900/70 opacity-0 transition-opacity duration-300 flex items-center justify-center flex-col text-white"><i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i><span class="font-medium">วัตถุดิบ</span></div>
                 </div>
             </div>
+            <!-- ========================================================================= -->
         </div>
     </section>
 
@@ -1077,4 +1086,4 @@
         }
     </script>
 </body>
-</html>"
+</html>
