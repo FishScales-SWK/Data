@@ -19,6 +19,9 @@
     <!-- ApexCharts for Graphs -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+    <!-- SweetAlert2 for beautiful modals -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -82,6 +85,7 @@
         }
         .hero-bg-image {
             width: 100%; height: 100%;
+            /* --- [ส่วนที่ 1] ลิงค์รูปพื้นหลังส่วนหัว (Hero Background) --- */
             background-image: linear-gradient(to right, rgba(12, 74, 110, 0.9), rgba(12, 74, 110, 0.5)), url('https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=2000&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
@@ -97,6 +101,7 @@
 
         /* Parallax Section */
         .parallax-bg {
+            /* --- [ส่วนที่ 2] ลิงค์รูปพื้นหลัง Parallax (วิสัยทัศน์) --- */
             background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop');
             background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: cover;
         }
@@ -238,9 +243,12 @@
                     <div class="absolute inset-0 bg-brand-500 rounded-2xl transform rotate-3 transition-transform group-hover:rotate-6 opacity-20"></div>
                     <div class="relative rounded-2xl shadow-2xl overflow-hidden h-[400px] w-full bg-gray-100 group-hover:scale-[1.01] transition-transform duration-500">
                         <div id="standards-carousel" class="w-full h-full relative">
-                            <!-- Modified: Replaced image with new Google Drive direct link -->
+                            <!-- [ส่วนที่ 3] ลิงค์รูปในสไลด์มาตรฐาน -->
+                            <!-- รูปที่ 1 -->
                             <img src="https://i.postimg.cc/Gt1WkVRD/42685.jpg" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100" data-index="0" alt="Standard Quality">
+                            <!-- รูปที่ 2 -->
                             <img src="https://i.postimg.cc/vZGK85YP/Gemini-Generated-Image-hv4j9nhv4j9nhv4j.png" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="1" alt="Microscope Analysis">
+                            <!-- รูปที่ 3 -->
                             <img src="https://i.postimg.cc/tg4F2Nyt/S-2179076.jpg" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0" data-index="2" alt="Quality Control">
                         </div>
                         <button onclick="changeStandardSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-brand-600/80 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 group/btn">
@@ -271,12 +279,15 @@
         <div class="max-w-6xl mx-auto px-4 z-10 fade-in-up">
             <!-- Removed Icon above -->
             <h2 class="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                <span class="text-yellow-400">"</span>เราเปลี่ยนสิ่งเหลือใช้จากธรรมชาติ <br>ให้กลายเป็นนวัตกรรมที่ล้ำค่า<span class="text-yellow-400">"</span>
+                <span class="text-yellow-400">"</span>เราเปลี่ยนสิ่งเหลือใช้จากธรรมชาติ 
+                <!-- Spacer: กำหนดความสูง 12pt ตามที่ระบุ -->
+                <div class="h-[12pt] w-full"></div> 
+                ให้กลายเป็นนวัตกรรมที่ล้ำค่า<span class="text-yellow-400">"</span>
             </h2>
         </div>
     </section>
 
-    <!-- Products (Replaced content with Gallery images, removed headings) -->
+    <!-- Products (Gallery) -->
     <section id="products" class="py-20 bg-brand-900 text-white relative overflow-hidden">
         <div id="bubbles-container" class="absolute inset-0 w-full h-full overflow-hidden z-0"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -284,41 +295,47 @@
                 <h2 class="text-brand-500 font-bold tracking-wide uppercase text-sm mb-2">Our Operations</h2>
                 <h3 class="text-3xl md:text-4xl font-bold text-white">ผลการดำเนินงานของ SWK FishScales</h3>
             </div>
-            <!-- ================= [3] จุดแสดงภาพสินค้า (ภาพล้วน ไม่มีคำบรรยาย) ================= -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 fade-in-up">
                 
+                <!-- [ส่วนที่ 4] ลิงค์รูปในแกลเลอรี่ผลงาน -->
                 <!-- Image 1 -->
                 <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group h-64 relative border-2 border-white/10" onclick="openLightbox('https://i.postimg.cc/zXwWNcG0/42674.jpg')">
+                    <!-- รูปผลงานที่ 1 -->
                     <img src="https://i.postimg.cc/zXwWNcG0/42674.jpg" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition z-10"></div>
                 </div>
 
                 <!-- Image 2 -->
                 <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group h-64 relative border-2 border-white/10" onclick="openLightbox('https://i.postimg.cc/J477y6Qp/E2758541-8C3A-43AA-896B-5ADFEF2DE6A0.jpg')">
+                    <!-- รูปผลงานที่ 2 -->
                     <img src="https://i.postimg.cc/J477y6Qp/E2758541-8C3A-43AA-896B-5ADFEF2DE6A0.jpg" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition z-10"></div>
                 </div>
 
                 <!-- Image 3 -->
                 <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group h-64 relative border-2 border-white/10" onclick="openLightbox('https://i.postimg.cc/JnqVM8Sw/52A3B5EF-3A63-4101-9A91-40440D85A2A4.jpg')">
+                    <!-- รูปผลงานที่ 3 -->
                     <img src="https://i.postimg.cc/JnqVM8Sw/52A3B5EF-3A63-4101-9A91-40440D85A2A4.jpg" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition z-10"></div>
                 </div>
 
                 <!-- Image 4 -->
                 <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group h-64 relative border-2 border-white/10" onclick="openLightbox('https://i.postimg.cc/nL9BycjV/070213EF-16C2-41D4-B2CE-00A406A346CD.jpg')">
+                    <!-- รูปผลงานที่ 4 -->
                     <img src="https://i.postimg.cc/nL9BycjV/070213EF-16C2-41D4-B2CE-00A406A346CD.jpg" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition z-10"></div>
                 </div>
 
                 <!-- Image 5 -->
                 <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group h-64 relative border-2 border-white/10" onclick="openLightbox('https://i.postimg.cc/LXzfsC37/42702-0.jpg')">
+                    <!-- รูปผลงานที่ 5 -->
                     <img src="https://i.postimg.cc/LXzfsC37/42702-0.jpg" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition z-10"></div>
                 </div>
 
                 <!-- Image 6 -->
                 <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-brand-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer group h-64 relative border-2 border-white/10" onclick="openLightbox('https://i.postimg.cc/1Rrwhdtd/42701-0.jpg')">
+                    <!-- รูปผลงานที่ 6 -->
                     <img src="https://i.postimg.cc/1Rrwhdtd/42701-0.jpg" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition z-10"></div>
                 </div>
@@ -326,8 +343,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Removed old Gallery Section -->
 
     <!-- FAQ -->
     <section id="faq" class="py-20 bg-white">
@@ -378,53 +393,55 @@
     <section id="contact" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row fade-in-up">
-                <div class="md:w-5/12 bg-gradient-to-br from-brand-600 to-brand-800 p-10 text-white flex flex-col justify-between">
+                <div class="md:w-5/12 bg-gradient-to-br from-brand-600 to-brand-800 p-10 text-white flex flex-col justify-center">
                     <div>
-                        <h3 class="text-3xl font-bold mb-6">ร่วมธุรกิจกับเรา</h3>
-                        <div class="space-y-6">
+                        <h3 class="text-3xl font-bold mb-8">ร่วมธุรกิจกับเรา</h3>
+                        <div class="space-y-8">
                             <div class="flex items-start gap-4">
                                 <div class="bg-white/20 p-3 rounded-lg"><i class="fa-solid fa-location-dot"></i></div>
-                                <div><h5 class="font-bold">ที่อยู่สำนักงาน</h5><p class="text-sm text-brand-100">9/1 ตำบลบางตะบูนออก <br>อำเภอบ้านแหลม จังหวัดเพชรบุรี</p></div>
+                                <div><h5 class="font-bold text-lg">ที่อยู่สำนักงาน</h5><p class="text-brand-100 leading-relaxed">9/1 ตำบลบางตะบูนออก <br>อำเภอบ้านแหลม จังหวัดเพชรบุรี</p></div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <div class="bg-white/20 p-3 rounded-lg"><i class="fa-solid fa-phone"></i></div>
-                                <div><h5 class="font-bold">โทรศัพท์</h5><p class="text-sm text-brand-100">062 261 5155</p></div>
+                                <div><h5 class="font-bold text-lg">โทรศัพท์</h5><p class="text-brand-100 text-lg">062 261 5155</p></div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <div class="bg-white/20 p-3 rounded-lg"><i class="fa-solid fa-envelope"></i></div>
-                                <div><h5 class="font-bold">อีเมล</h5><p class="text-sm text-brand-100">sales@swkfishscales.com</p></div>
+                                <div><h5 class="font-bold text-lg">อีเมล</h5><p class="text-brand-100 text-lg">sales@swkfishscales.com</p></div>
                             </div>
                         </div>
-                        <div class="mt-8">
-                            <button onclick="openContactModal()" class="w-full bg-white text-brand-700 font-bold py-3 rounded-lg hover:bg-brand-50 transition shadow-md flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-paper-plane"></i> ส่งข้อความถึงเรา
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mt-10 flex gap-4">
-                        <a href="https://www.facebook.com/swk.DriedFishScales" target="_blank" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white hover:text-brand-600 transition hover:scale-110"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white hover:text-brand-600 transition hover:scale-110"><i class="fa-brands fa-line"></i></a>
                     </div>
                 </div>
                 <div class="md:w-7/12 p-10 flex flex-col items-center justify-center bg-gray-50/50">
                     <h3 class="text-2xl font-bold text-gray-800 mb-8">ช่องทางติดต่อออนไลน์</h3>
-                    <div class="flex flex-col md:flex-row items-center gap-8 w-full justify-center">
-                        <div class="flex flex-col items-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                            <div class="w-48 h-48 bg-white p-2 rounded-lg mb-4 border border-gray-100">
+                    <!-- เพิ่ม items-stretch เพื่อให้กล่องยืดความสูงเท่ากันในแนวแกนขวาง -->
+                    <div class="flex flex-col md:flex-row items-center md:items-stretch gap-8 w-full justify-center">
+                        
+                        <!-- LINE Official Block -->
+                        <!-- คงขนาด w และ min-h ไว้เท่าเดิม -->
+                        <div class="flex flex-col items-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 w-full md:w-[320px] min-h-[340px]">
+                            <div class="w-48 h-48 bg-white p-2 rounded-lg mb-4 border border-gray-100 flex items-center justify-center">
+                                <!-- [ส่วนที่ 5] ลิงค์รูป QR Code Line -->
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://line.me/ti/p/~swkfishscales" alt="Line QR Code" class="w-full h-full object-contain">
                             </div>
-                            <div class="text-center">
+                            <div class="text-center mt-auto">
                                 <div class="flex items-center justify-center gap-2 mb-1"><i class="fa-brands fa-line text-green-500 text-2xl"></i><p class="font-bold text-gray-800 text-lg">LINE Official</p></div>
                                 <p class="text-sm text-gray-500">สแกนเพื่อสอบถามข้อมูลทันที</p>
                             </div>
                         </div>
+
                         <div class="md:hidden text-gray-400 font-medium">หรือ</div>
-                        <a href="https://www.facebook.com/swk.DriedFishScales" target="_blank" class="group flex flex-col items-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all duration-300 w-full md:w-auto min-w-[250px] min-h-[280px]">
-                            <div class="w-40 h-40 bg-white p-1 rounded-full mb-4 border border-gray-200 relative shadow-sm group-hover:shadow-md transition-all">
-                                <img src="https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition duration-500" alt="Profile Picture">
+                        
+                        <!-- Facebook Page Block -->
+                        <!-- ลบ md:translate-y-4 ออกเพื่อให้ระดับเท่ากัน และใช้ขนาดเท่ากับ LINE -->
+                        <a href="https://www.facebook.com/swk.DriedFishScales" target="_blank" class="group flex flex-col items-center p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all duration-300 w-full md:w-[320px] min-h-[340px]">
+                            <!-- ปรับขนาดรูป w-40 h-40 เป็น w-48 h-48 ให้เท่ากับกล่อง Line -->
+                            <div class="w-48 h-48 bg-white p-1 rounded-full mb-4 border border-gray-200 relative shadow-sm group-hover:shadow-md transition-all flex items-center justify-center">
+                                <!-- [ส่วนที่ 6] ลิงค์รูปโปรไฟล์เพจ Facebook -->
+                                <img src="https://i.postimg.cc/26pcJt5H/ภาพ_2026_01_17_212935153.png" class="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition duration-500" alt="Profile Picture">
                                 <div class="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg shadow-md border-4 border-white z-10"><i class="fa-brands fa-facebook-f"></i></div>
                             </div>
-                            <div class="text-center">
+                            <div class="text-center mt-auto">
                                 <p class="font-bold text-gray-800 text-lg mb-1 group-hover:text-blue-600 transition">SWK DriedFishScales</p>
                                 <p class="text-sm text-gray-500 mb-4">ติดตามข่าวสารและผลงาน</p>
                                 <span class="inline-block px-4 py-2 bg-gray-100 text-gray-600 text-sm rounded-full group-hover:bg-blue-600 group-hover:text-white transition">ไปที่เพจ <i class="fa-solid fa-arrow-right ml-1"></i></span>
@@ -797,7 +814,16 @@
             m.classList.add('opacity-0'); m.firstElementChild.classList.add('scale-95'); setTimeout(() => { m.classList.add('hidden'); }, 300);
         }
         function submitContactForm(e) {
-            e.preventDefault(); alert('ขอบคุณสำหรับข้อมูล เราจะติดต่อกลับโดยเร็วที่สุด'); closeContactModal(); e.target.reset();
+            e.preventDefault(); 
+            Swal.fire({
+                title: 'สำเร็จ!',
+                text: 'ขอบคุณสำหรับข้อมูล เราจะติดต่อกลับโดยเร็วที่สุด',
+                icon: 'success',
+                confirmButtonColor: '#0ea5e9',
+                confirmButtonText: 'ตกลง'
+            });
+            closeContactModal(); 
+            e.target.reset();
         }
 
         // --- 4. ADMIN SYSTEM CORE LOGIC ---
@@ -831,7 +857,11 @@
                 fetchData();
                 switchAdminTab('production');
             } else {
-                alert('รหัสผ่านไม่ถูกต้อง');
+                Swal.fire({
+                    title: 'รหัสผ่านไม่ถูกต้อง',
+                    icon: 'error',
+                    confirmButtonColor: '#0ea5e9'
+                });
             }
         }
 
@@ -895,7 +925,9 @@
                 const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=load&t=${Date.now()}`);
                 const result = await response.json();
                 if (result.success) { appData = result.data; renderAll(); }
-            } catch (error) { console.log('Demo Mode: Fetch Failed'); } 
+            } catch (error) { 
+                console.log('Demo Mode: Fetch Failed'); 
+            } 
             finally { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
         }
 
@@ -907,23 +939,65 @@
             
             try {
                 await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action, type, data }), headers: { 'Content-Type': 'application/json' } });
-                setTimeout(() => { fetchData(); alert('บันทึกสำเร็จ'); }, 1500);
-            } catch (e) { alert('Error: ' + e.message); overlay.classList.add('hidden'); }
+                setTimeout(() => { 
+                    fetchData(); 
+                    Swal.fire({
+                        title: 'สำเร็จ',
+                        text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }, 1500);
+            } catch (e) { 
+                Swal.fire('Error', e.message, 'error');
+                overlay.classList.add('hidden'); 
+            }
         }
 
         async function deleteData(id, type) {
-            if(!confirm('ยืนยันลบ?')) return;
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: "คุณต้องการลบข้อมูลนี้ใช่หรือไม่ การกระทำนี้ไม่สามารถย้อนกลับได้",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#3b82f6',
+                confirmButtonText: 'ลบข้อมูล',
+                cancelButtonText: 'ยกเลิก'
+            });
+
+            if (!result.isConfirmed) return;
+
             const overlay = document.getElementById('loading-overlay');
             overlay.classList.remove('hidden'); overlay.classList.add('flex');
             try {
                 await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', type, data: { id } }) });
-                setTimeout(() => { fetchData(); }, 1500);
-            } catch (e) { alert('Error'); overlay.classList.add('hidden'); }
+                setTimeout(() => { 
+                    fetchData();
+                    Swal.fire({
+                        title: 'ลบข้อมูลสำเร็จ',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }, 1500);
+            } catch (e) { 
+                Swal.fire('Error', 'ไม่สามารถลบข้อมูลได้', 'error');
+                overlay.classList.add('hidden'); 
+            }
         }
 
         function submitProduction() {
             const qty = document.getElementById('input-prod-today').value;
-            if (!qty || qty <= 0) return alert('ระบุจำนวน');
+            if (!qty || qty <= 0) {
+                return Swal.fire({
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณาระบุจำนวนกระสอบที่ถูกต้อง',
+                    icon: 'warning',
+                    confirmButtonColor: '#0ea5e9'
+                });
+            }
             sendData('add', 'Production', { bags: parseInt(qty), kilos: parseInt(qty) * 10, timestamp: new Date().toISOString() });
             document.getElementById('input-prod-today').value = '';
         }
@@ -933,10 +1007,26 @@
             const type = document.getElementById('inv-type').value;
             const name = document.getElementById('inv-name').value;
             let qty = parseFloat(document.getElementById('inv-qty').value);
-            if (!type || !name || !qty) return alert('กรอกข้อมูลให้ครบ');
+            
+            if (!type || !name || !qty) {
+                return Swal.fire({
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง',
+                    icon: 'warning',
+                    confirmButtonColor: '#0ea5e9'
+                });
+            }
+            
             if (type === 'ขายออก') {
                 const stock = calculateReadyStockBags();
-                if (qty > stock) return alert(`สต็อกไม่พอ (มี ${stock} กระสอบ)`);
+                if (qty > stock) {
+                    return Swal.fire({
+                        title: 'สต็อกไม่เพียงพอ',
+                        text: `สินค้ามีเพียง ${stock} กระสอบ ไม่สามารถขายออก ${qty} กระสอบได้`,
+                        icon: 'error',
+                        confirmButtonColor: '#0ea5e9'
+                    });
+                }
                 qty = qty * 10;
             }
             sendData('add', 'Records', { status: type, name, quantity: qty, images: currentInvImages });
@@ -999,7 +1089,7 @@
                     const d = parseDate(r.timestamp);
                     const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')} ${d.getHours()}:${d.getMinutes()}`;
                     const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-50 hover:bg-gray-50';
+                    tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
                     tr.innerHTML = cols(r, ds);
                     tbody.appendChild(tr);
                 });
@@ -1009,7 +1099,7 @@
                 <td class="p-4 text-gray-600">${ds}</td>
                 <td class="p-4 text-center font-bold text-gray-800">${parseInt(r.bags).toLocaleString()}</td>
                 <td class="p-4 text-center text-gray-500">${(parseInt(r.bags)*10).toLocaleString()}</td>
-                <td class="p-4 text-right"><button onclick="deleteData('${r.id}', 'Production')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td>
+                <td class="p-4 text-right"><button onclick="deleteData('${r.id}', 'Production')" class="text-red-400 hover:text-red-600 transition p-2 hover:bg-red-50 rounded-full"><i class="fa-solid fa-trash"></i></button></td>
             `);
 
             renderTable('table-inv-body', appData.records, (r, ds) => `
@@ -1019,7 +1109,7 @@
                     <span class="text-xs px-2 py-0.5 rounded ${r.status==='ซื้อเข้า'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}">${r.status}</span>
                 </td>
                 <td class="p-4 text-center font-bold">${parseFloat(r.quantity).toLocaleString()}</td>
-                <td class="p-4 text-right"><button onclick="deleteData('${r.id}', 'Records')" class="text-gray-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td>
+                <td class="p-4 text-right"><button onclick="deleteData('${r.id}', 'Records')" class="text-gray-400 hover:text-red-600 transition p-2 hover:bg-red-50 rounded-full"><i class="fa-solid fa-trash"></i></button></td>
             `);
 
             // Chart
@@ -1039,10 +1129,12 @@
             if(charts.production) charts.production.destroy();
             charts.production = new ApexCharts(document.querySelector("#chart-production"), {
                 series: [{ name: 'กระสอบ', data }],
-                chart: { type: 'bar', height: 200, toolbar: { show: false } },
+                chart: { type: 'bar', height: 200, toolbar: { show: false }, fontFamily: 'Prompt, sans-serif' },
                 colors: ['#10b981'],
-                plotOptions: { bar: { borderRadius: 4 } },
-                xaxis: { categories: labels }
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+                dataLabels: { enabled: false },
+                xaxis: { categories: labels, axisBorder: { show: false }, axisTicks: { show: false } },
+                grid: { show: true, borderColor: '#f3f4f6', strokeDashArray: 4 }
             });
             charts.production.render();
         }
