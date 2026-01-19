@@ -115,25 +115,25 @@
             100% { transform: translateY(-120vh); opacity: 0; }
         }
 
-        /* Modern Colorful Scrollbar for Chart - ENLARGED & SPACED */
-        #daily-chart-scroller::-webkit-scrollbar {
+        /* Modern Colorful Scrollbar for Charts - GLOBAL CLASS */
+        .custom-scrollbar::-webkit-scrollbar {
             height: 20px; 
         }
-        #daily-chart-scroller::-webkit-scrollbar-track {
+        .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 10px;
             margin-top: 10px; 
             border: 4px solid transparent;
             background-clip: content-box;
         }
-        #daily-chart-scroller::-webkit-scrollbar-thumb {
+        .custom-scrollbar::-webkit-scrollbar-thumb {
             background: linear-gradient(90deg, #a78bfa, #7c3aed);
             border-radius: 10px;
             border: 4px solid transparent;
             background-clip: content-box;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
         }
-        #daily-chart-scroller::-webkit-scrollbar-thumb:hover {
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(90deg, #7c3aed, #6d28d9);
         }
 
@@ -430,7 +430,7 @@
                         <p class="text-lg md:text-xl text-gray-600">เกล็ดปลาตากแห้ง</p>
                     </div>
 
-                    <!-- Production Stats (Centered Numbers + Right Unit) -->
+                    <!-- Production Stats (Updated Layout) -->
                     <div class="flex flex-wrap justify-center gap-4">
                         <div class="bg-gradient-to-br from-emerald-100 to-emerald-200 border border-emerald-300 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 min-w-[280px] h-40 relative flex flex-col">
                             <div class="flex justify-between items-start z-10">
@@ -441,10 +441,10 @@
                                 <p class="text-5xl md:text-6xl font-bold text-emerald-900" id="prod-today">0</p>
                             </div>
                             <div class="absolute bottom-4 right-6 z-10">
-                                <span class="text-lg text-emerald-700 font-medium">กระสอบ</span>
+                                <span class="text-lg text-emerald-700 font-bold">กระสอบ</span>
                             </div>
                         </div>
-
+                        
                         <div class="bg-gradient-to-br from-violet-100 to-violet-200 border border-violet-300 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 min-w-[280px] h-40 relative flex flex-col">
                             <div class="flex justify-between items-start z-10">
                                 <h3 class="text-lg md:text-xl font-semibold text-violet-800">ทำได้เดือนนี้</h3>
@@ -454,10 +454,10 @@
                                 <p class="text-5xl md:text-6xl font-bold text-violet-900" id="prod-month">0</p>
                             </div>
                             <div class="absolute bottom-4 right-6 z-10">
-                                <span class="text-lg text-violet-700 font-medium">กระสอบ</span>
+                                <span class="text-lg text-violet-700 font-bold">กระสอบ</span>
                             </div>
                         </div>
-
+                        
                         <div class="bg-gradient-to-br from-sky-100 to-sky-200 border border-sky-300 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 min-w-[280px] h-40 relative flex flex-col">
                             <div class="flex justify-between items-start z-10">
                                 <h3 class="text-lg md:text-xl font-semibold text-sky-800">ของพร้อมส่ง</h3>
@@ -467,7 +467,7 @@
                                 <p class="text-5xl md:text-6xl font-bold text-sky-900" id="prod-stock">0</p>
                             </div>
                             <div class="absolute bottom-4 right-6 z-10">
-                                <span class="text-lg text-sky-700 font-medium">กระสอบ</span>
+                                <span class="text-lg text-sky-700 font-bold">กระสอบ</span>
                             </div>
                         </div>
                     </div>
@@ -532,18 +532,16 @@
                                     <label for="chk-daily-month" class="text-sm font-medium text-gray-700">เดือน:</label>
                                     <select id="prod-daily-filter-month" onchange="renderDailyProductionChart()" class="px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm bg-white min-w-[100px]"></select>
                                 </div>
-                                <span class="text-xs text-gray-400 ml-auto hidden sm:inline">(เลื่อนเพื่อดูย้อนหลัง)</span>
+                                <!-- Text removed here -->
                             </div>
                         </div>
                         
                         <!-- Fixed Y-Axis Layout -->
                         <div class="flex w-full h-[450px] border border-gray-100 rounded-xl overflow-hidden relative bg-white">
                             
-                            <!-- Removed Floating Labels "จำนวน" and "วันที่" as requested -->
-
-                            <!-- Fixed Y Axis Column -->
-                            <div class="w-[70px] h-full flex-shrink-0 relative z-20 bg-white pb-12">
-                                <div id="chart-daily-y" class="absolute -top-3 -left-2 w-[80px] h-full"></div> 
+                            <!-- Fixed Y Axis Column - Increased width to 80px -->
+                            <div class="w-[80px] h-full flex-shrink-0 relative z-20 bg-white pb-12">
+                                <div id="chart-daily-y" class="absolute -top-3 -left-2 w-[90px] h-full"></div> 
                             </div>
                             
                             <!-- Scrollable X Axis Column -->
@@ -576,6 +574,7 @@
 
                     <!-- Inventory Stats -->
                     <div class="flex flex-wrap justify-center gap-4">
+                        <!-- Buy In Card -->
                         <div class="bg-gradient-to-br from-green-100 to-green-200 border border-green-300 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 min-w-[280px] h-40 relative flex flex-col">
                             <div class="flex justify-between items-start z-10">
                                 <h3 class="text-xl font-semibold text-green-800">ซื้อเข้าเดือนนี้</h3>
@@ -589,6 +588,7 @@
                             </div>
                         </div>
 
+                        <!-- Sell Out Card -->
                         <div class="bg-gradient-to-br from-red-100 to-red-200 border border-red-300 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 min-w-[280px] h-40 relative flex flex-col">
                             <div class="flex justify-between items-start z-10">
                                 <h3 class="text-xl font-semibold text-red-800">ขายออกเดือนนี้</h3>
@@ -602,6 +602,7 @@
                             </div>
                         </div>
 
+                        <!-- Stock Card -->
                         <div class="bg-gradient-to-br from-violet-100 to-violet-200 border border-violet-300 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 min-w-[280px] h-40 relative flex flex-col">
                             <div class="flex justify-between items-start z-10">
                                 <h3 class="text-xl font-semibold text-violet-800">ของพร้อมส่ง</h3>
@@ -697,13 +698,49 @@
                         </div>
                     </div>
 
-                    <!-- NEW Inventory Chart Container -->
+                    <!-- NEW Inventory Chart Container (Buy vs Sell) -->
                     <div class="bg-white backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 md:p-10">
-                        <div class="flex items-center gap-3 mb-8">
-                            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-3 rounded-2xl text-white"><i class="fa-solid fa-chart-bar text-xl"></i></div>
-                            <h2 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">ภาพรวมปริมาณสินค้า (KG)</h2>
+                        <div class="flex flex-col gap-4 mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-3 rounded-2xl text-white"><i class="fa-solid fa-chart-bar text-xl"></i></div>
+                                <h2 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">ปริมาณสินค้า (ซื้อเข้า/ขายออก)</h2>
+                            </div>
+
+                            <!-- Inventory Chart Filters -->
+                            <div class="flex flex-wrap gap-4 items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-700">ปี:</span>
+                                    <select id="inv-chart-filter-year" onchange="renderInventoryChart()" class="px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm bg-white min-w-[80px]"></select>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="chk-inv-chart-month" checked onchange="toggleInvChartFilters()" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300">
+                                    <label for="chk-inv-chart-month" class="text-sm font-medium text-gray-700">เดือน:</label>
+                                    <select id="inv-chart-filter-month" onchange="renderInventoryChart()" class="px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm bg-white min-w-[100px]"></select>
+                                </div>
+                                <div class="flex items-center gap-2 ml-2 border-l pl-4 border-gray-300">
+                                    <label class="text-sm font-medium text-gray-700">สถานะ:</label>
+                                    <select id="inv-chart-filter-status" onchange="renderInventoryChart()" class="px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                        <option value="">ทั้งหมด</option>
+                                        <option value="ซื้อเข้า">ซื้อเข้า</option>
+                                        <option value="ขายออก">ขายออก</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div id="chart-inventory" class="min-h-[350px]"></div>
+
+                        <!-- Scrollable Inventory Chart Layout (Fixed Height Sync) -->
+                        <div class="flex w-full h-[450px] border border-gray-100 rounded-xl overflow-hidden relative bg-white">
+                            
+                            <!-- Fixed Y Axis Column - Set to 80px -->
+                            <div class="w-[80px] h-full flex-shrink-0 relative z-20 bg-white pb-12">
+                                <div id="chart-inventory-y" class="absolute -top-3 -left-2 w-[90px] h-full"></div> 
+                            </div>
+                            
+                            <!-- Scrollable X Axis Column -->
+                            <div id="inventory-chart-scroller" class="flex-grow h-full overflow-x-auto overflow-y-hidden relative z-10 bg-white custom-scrollbar pb-12">
+                                <div id="chart-inventory" class="h-full"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-8 mb-4 text-center">
@@ -756,7 +793,7 @@
 
         function createBubbles() {
             const container = document.getElementById('bubbles-container');
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 50; i++) {
                 const bubble = document.createElement('div');
                 bubble.classList.add('bubble');
                 const size = Math.random() * 40 + 10 + 'px';
@@ -824,7 +861,7 @@
         // --- ADMIN SYSTEM CORE LOGIC ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfxWs81WEsrizNnTi82tZAOH_EHX1hKnvUoqsARpYch3TTjEqz5oepiol_vWQ4lK3G0g/exec';
         let appData = { records: [], production: [] };
-        let charts = { production: null, inventory: null, dailyProduction: null, dailyY: null };
+        let charts = { production: null, inventory: null, dailyProduction: null, dailyY: null, invMain: null, invY: null };
         let currentInvImages = []; // Array of base64 strings
 
         // Helpers
@@ -883,7 +920,10 @@
                     renderProductionView(); 
                     renderDailyProductionChart(); // Render the new chart
                 }
-                if(tabName === 'inventory') renderInventoryView();
+                if(tabName === 'inventory') {
+                    renderInventoryView();
+                    renderInventoryChart(); // NEW: Render Inventory Chart
+                }
             }, 100);
         }
 
@@ -926,14 +966,28 @@
                 });
             }
 
+            // Daily Inventory Chart Filters (NEW)
+            ['inv-chart-filter-year'].forEach(id => createOpts(id, yearOpts, currentYear));
+            const invMonthSel = document.getElementById('inv-chart-filter-month');
+            if(invMonthSel) {
+                invMonthSel.innerHTML = `<option value="all">ทั้งหมด</option>`;
+                monthOpts.forEach(i => {
+                    const opt = document.createElement('option');
+                    opt.value = i.value; opt.text = i.text;
+                    invMonthSel.appendChild(opt);
+                });
+            }
+
             // Set defaults to current year/month
-            document.getElementById('prod-filter-year').value = currentYear;
-            document.getElementById('prod-filter-month').value = new Date().getMonth() + 1;
-            document.getElementById('inv-filter-year').value = currentYear;
-            document.getElementById('inv-filter-month').value = new Date().getMonth() + 1;
+            const curMonth = new Date().getMonth() + 1;
             
-            document.getElementById('prod-daily-filter-year').value = currentYear;
-            document.getElementById('prod-daily-filter-month').value = new Date().getMonth() + 1;
+            ['prod-filter-year', 'inv-filter-year', 'prod-daily-filter-year', 'inv-chart-filter-year'].forEach(id => {
+                 const el = document.getElementById(id); if(el) el.value = currentYear;
+            });
+            
+            ['prod-filter-month', 'inv-filter-month', 'prod-daily-filter-month', 'inv-chart-filter-month'].forEach(id => {
+                 const el = document.getElementById(id); if(el) el.value = curMonth;
+            });
         }
 
         function toggleDailyChartFilters() {
@@ -959,6 +1013,28 @@
             }
 
             renderDailyProductionChart();
+        }
+
+        // NEW: Toggle function for Inventory Chart
+        function toggleInvChartFilters() {
+            const monthChk = document.getElementById('chk-inv-chart-month');
+            const yearSel = document.getElementById('inv-chart-filter-year');
+            const monthSel = document.getElementById('inv-chart-filter-month');
+
+            // If month is unchecked (Yearly view), disable month select.
+            // Year select stays enabled (although in Yearly view we show all years, 
+            // but keeping it enabled is fine or we can disable it if we want strict logic. 
+            // Based on Daily chart behavior, we enable year when month is checked).
+            
+            if (monthChk.checked) {
+                yearSel.disabled = false;
+                monthSel.disabled = false;
+            } else {
+                yearSel.disabled = true; // Disable year in Yearly aggregate view (Show all years)
+                monthSel.disabled = true;
+            }
+
+            renderInventoryChart();
         }
 
         function toggleInvForm(type) {
@@ -1055,7 +1131,10 @@
                         renderProductionView(); 
                         renderDailyProductionChart(); // Render chart on load if active
                     }
-                    if(!document.getElementById('view-inventory').classList.contains('hidden')) renderInventoryView();
+                    if(!document.getElementById('view-inventory').classList.contains('hidden')) {
+                        renderInventoryView();
+                        renderInventoryChart(); // NEW: Render Inventory Chart
+                    }
                 }
             } catch (error) { console.log('Fetch Failed', error); } 
             finally { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
@@ -1209,12 +1288,17 @@
                     const d = parseDate(r.timestamp);
                     const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} น.`;
                     const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
+                    // Updated: Added text-base for uniform font size
+                    tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition text-base';
                     tr.innerHTML = `
-                        <td class="p-4 text-center text-gray-600 text-sm">${ds}</td>
-                        <td class="p-4 text-center font-bold text-gray-800">${r.bags.toLocaleString()} กระสอบ</td>
-                        <td class="p-4 text-center text-gray-500">${r.kilos.toLocaleString()} กิโลกรัม</td>
-                        <td class="p-4 text-right"><button onclick="deleteData('${r.id}', 'Production')" class="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-full"><i class="fa-solid fa-trash-can"></i></button></td>
+                        <td class="p-4 text-center text-gray-700 align-middle">${ds}</td>
+                        <td class="p-4 text-center text-gray-700 align-middle">${r.bags.toLocaleString()} กระสอบ</td>
+                        <td class="p-4 text-center text-gray-700 align-middle">${r.kilos.toLocaleString()} กิโลกรัม</td>
+                        <td class="p-4 text-center align-middle">
+                            <button onclick="deleteData('${r.id}', 'Production')" class="w-10 h-10 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-500 hover:text-red-700 rounded-full transition-all duration-200 shadow-sm mx-auto">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1242,7 +1326,7 @@
                 });
 
                 if (sortedGroups.length === 0) {
-                      tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">ไม่พบข้อมูล</td></tr>';
+                      tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500 text-base">ไม่พบข้อมูล</td></tr>';
                 }
 
                 sortedGroups.forEach(g => {
@@ -1251,12 +1335,13 @@
                     const ds = `${monthName} ${yearThai}`;
                     
                     const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
+                    // Updated: Added text-base for uniform font size
+                    tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition text-base';
                     tr.innerHTML = `
-                        <td class="p-4 text-center text-gray-800 font-medium">${ds}</td>
-                        <td class="p-4 text-center font-bold text-gray-800">${g.bags.toLocaleString()} กระสอบ</td>
-                        <td class="p-4 text-center text-gray-500">${g.kilos.toLocaleString()} กิโลกรัม</td>
-                        <td class="p-4 text-center text-sm text-gray-400">(${g.count} รายการ)</td>
+                        <td class="p-4 text-center text-gray-700 align-middle">${ds}</td>
+                        <td class="p-4 text-center text-gray-700 align-middle">${g.bags.toLocaleString()} กระสอบ</td>
+                        <td class="p-4 text-center text-gray-700 align-middle">${g.kilos.toLocaleString()} กิโลกรัม</td>
+                        <td class="p-4 text-center text-gray-700 align-middle">(${g.count} รายการ)</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1429,7 +1514,8 @@
                         formatter: (val) => val.toFixed(0),
                         style: { fontSize: '16px', fontWeight: 700, colors: '#64748b' }, // Increased font size
                         align: 'right',
-                        minWidth: 40
+                        minWidth: 40,
+                        offsetX: -15 // Moved left by ~0.5cm (approx 15-20px)
                     },
                     axisBorder: { show: false }, // Ensure no axis line
                     axisTicks: { show: false }
@@ -1528,7 +1614,6 @@
             let inKg = 0, outKg = 0;
             appData.records.forEach(r => {
                 const d = parseDate(r.timestamp);
-                // OLD: const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} น.`;
                 if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) {
                     if (r.status === 'ซื้อเข้า') inKg += r.quantity; else if (r.status === 'ขายออก') outKg += r.quantity;
                 }
@@ -1599,26 +1684,8 @@
                 tbody.appendChild(tr);
             });
 
-            // Chart
-            const chartData = prepareChartData(filtered, 'inventory', fYear && fMonth);
-            
-            if(charts.inventory) charts.inventory.destroy();
-            charts.inventory = new ApexCharts(document.querySelector("#chart-inventory"), {
-                series: [
-                    { name: 'ซื้อเข้า (KG)', data: chartData.buy },
-                    { name: 'ขายออก (KG)', data: chartData.sell }
-                ],
-                chart: { type: 'bar', height: 350, toolbar: { show: false }, fontFamily: 'Prompt, sans-serif', stacked: false },
-                colors: ['#22c55e', '#ef4444'],
-                plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
-                dataLabels: { enabled: false },
-                stroke: { show: true, width: 2, colors: ['transparent'] },
-                xaxis: { categories: chartData.labels },
-                yaxis: { title: { text: 'กิโลกรัม (KG)' } },
-                fill: { opacity: 1 },
-                grid: { borderColor: '#f3f4f6' }
-            });
-            charts.inventory.render();
+            // REMOVED OLD CHART RENDERING LOGIC FROM HERE
+            // The chart is now handled exclusively by renderInventoryChart()
         }
 
         function prepareChartData(data, type, isDaily) {
@@ -1661,6 +1728,262 @@
             });
 
             return { labels, values, buy, sell };
+        }
+
+        // --- NEW FUNCTION: Render Inventory Chart (Buy/Sell) ---
+        function renderInventoryChart() {
+            const rawData = appData.records; // Use records for inventory
+            
+            // Get Filters
+            const monthChk = document.getElementById('chk-inv-chart-month').checked;
+            const yearVal = parseInt(document.getElementById('inv-chart-filter-year').value) || new Date().getFullYear();
+            const monthVal = document.getElementById('inv-chart-filter-month').value;
+            const statusVal = document.getElementById('inv-chart-filter-status').value;
+
+            const isAllMonths = monthVal === 'all';
+            const selectedMonth = parseInt(monthVal);
+
+            // --- 1. Yearly Aggregation Mode (Month Unchecked) ---
+            if (!monthChk) {
+                 const yearMap = {};
+                 rawData.forEach(r => {
+                     if (statusVal && r.status !== statusVal) return;
+                     const d = parseDate(r.timestamp);
+                     const y = d.getFullYear();
+                     if (!yearMap[y]) yearMap[y] = { buy: 0, sell: 0 };
+                     
+                     if (r.status === 'ซื้อเข้า') yearMap[y].buy += r.quantity;
+                     else if (r.status === 'ขายออก') yearMap[y].sell += r.quantity;
+                 });
+                 
+                 const years = Object.keys(yearMap).sort();
+                 const buySeries = years.map(y => yearMap[y].buy);
+                 const sellSeries = years.map(y => yearMap[y].sell);
+                 const categories = years.map(y => (parseInt(y)+543).toString());
+
+                 renderApexInventoryChart(categories, buySeries, sellSeries, false);
+                 return;
+            }
+
+            // --- 2. Monthly Aggregation Mode (Year Checked, Month 'All') ---
+            if (isAllMonths) {
+                const monthMap = {};
+                rawData.forEach(r => {
+                     if (statusVal && r.status !== statusVal) return;
+                     const d = parseDate(r.timestamp);
+                     if (d.getFullYear() === yearVal) {
+                         const m = d.getMonth();
+                         if (!monthMap[m]) monthMap[m] = { buy: 0, sell: 0 };
+                         if (r.status === 'ซื้อเข้า') monthMap[m].buy += r.quantity;
+                         else if (r.status === 'ขายออก') monthMap[m].sell += r.quantity;
+                     }
+                });
+
+                const categories = [];
+                const buySeries = [];
+                const sellSeries = [];
+                for(let i=0; i<12; i++) {
+                    categories.push(getThaiMonthName(i+1));
+                    const data = monthMap[i] || { buy: 0, sell: 0 };
+                    buySeries.push(data.buy);
+                    sellSeries.push(data.sell);
+                }
+                
+                renderApexInventoryChart(categories, buySeries, sellSeries, false);
+                return;
+            }
+
+            // --- 3. Daily Mode (Specific Month) ---
+            let startDate, endDate;
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            let isCurrentMonth = false;
+
+            if (monthChk && !isAllMonths) {
+                startDate = new Date(yearVal, selectedMonth - 1, 1);
+                endDate = new Date(yearVal, selectedMonth, 0);
+                isCurrentMonth = (today.getFullYear() === yearVal && (today.getMonth() + 1) === selectedMonth);
+            } else {
+                startDate = new Date(today);
+                startDate.setDate(startDate.getDate() - 15);
+                endDate = new Date(today);
+                endDate.setDate(endDate.getDate() + 5);
+                isCurrentMonth = true;
+            }
+
+            const dailyMap = {};
+            let iter = new Date(startDate);
+            while(iter <= endDate) {
+                const key = iter.getFullYear() + '-' + String(iter.getMonth()+1).padStart(2,'0') + '-' + String(iter.getDate()).padStart(2,'0');
+                dailyMap[key] = { buy: 0, sell: 0 };
+                iter.setDate(iter.getDate() + 1);
+            }
+
+            rawData.forEach(r => {
+                if (statusVal && r.status !== statusVal) return;
+                const d = parseDate(r.timestamp);
+                d.setHours(0,0,0,0);
+                
+                if (d >= startDate && d <= endDate) {
+                     const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                     if (dailyMap[key]) {
+                         if (r.status === 'ซื้อเข้า') dailyMap[key].buy += r.quantity;
+                         else if (r.status === 'ขายออก') dailyMap[key].sell += r.quantity;
+                     }
+                }
+            });
+
+            const categories = [];
+            const buySeries = [];
+            const sellSeries = [];
+            let todayIndex = -1;
+            let i = 0;
+            
+            iter = new Date(startDate);
+            while(iter <= endDate) {
+                const key = iter.getFullYear() + '-' + String(iter.getMonth()+1).padStart(2,'0') + '-' + String(iter.getDate()).padStart(2,'0');
+                categories.push(key); 
+                const data = dailyMap[key] || { buy: 0, sell: 0 };
+                buySeries.push(data.buy);
+                sellSeries.push(data.sell);
+
+                if (iter.getTime() === today.getTime()) todayIndex = i;
+                
+                iter.setDate(iter.getDate() + 1);
+                i++;
+            }
+
+            renderApexInventoryChart(categories, buySeries, sellSeries, true, isCurrentMonth ? todayIndex : -1);
+        }
+
+        function renderApexInventoryChart(categories, buyData, sellSeries, isScrollable, centerIndex = -1) {
+            const allValues = [...buyData, ...sellSeries];
+            let maxVal = Math.max(...allValues);
+            maxVal = maxVal > 0 ? Math.ceil(maxVal / 100) * 100 : 100;
+
+            if (charts.invMain) charts.invMain.destroy();
+            if (charts.invY) charts.invY.destroy();
+
+            let calculatedWidth = '100%';
+            const scroller = document.getElementById('inventory-chart-scroller');
+            
+            if (isScrollable) {
+                const containerWidth = scroller.clientWidth;
+                const singleBarWidth = containerWidth / 5; // Show 5 days per screen
+                calculatedWidth = Math.max(containerWidth, categories.length * singleBarWidth);
+            }
+
+            // 1. Y Axis Chart (Fixed)
+            charts.invY = new ApexCharts(document.querySelector("#chart-inventory-y"), {
+                series: [{ name: 'Dummy', data: buyData }], 
+                chart: {
+                    type: 'bar', height: '100%', width: '100%',
+                    fontFamily: 'Prompt, sans-serif', toolbar: { show: false },
+                    animations: { enabled: false }, parentHeightOffset: 0
+                },
+                colors: ['transparent'],
+                plotOptions: { bar: { columnWidth: '0%' } },
+                dataLabels: { enabled: false },
+                grid: { show: false, padding: { top: 0, bottom: 0, left: 10 } },
+                xaxis: {
+                    labels: { show: true, style: { colors: 'transparent' } },
+                    axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false }
+                },
+                yaxis: {
+                    min: 0, max: maxVal, tickAmount: 5,
+                    labels: { 
+                        formatter: (val) => val.toLocaleString(),
+                        style: { fontSize: '16px', fontWeight: 700, colors: '#64748b' },
+                        align: 'right', minWidth: 40,
+                        offsetX: -15
+                    },
+                    axisBorder: { show: false }, axisTicks: { show: false }
+                }
+            });
+            charts.invY.render();
+
+            // 2. Main Chart (Scrollable)
+            charts.invMain = new ApexCharts(document.querySelector("#chart-inventory"), {
+                series: [
+                    { name: 'ซื้อเข้า', data: buyData },
+                    { name: 'ขายออก', data: sellSeries }
+                ],
+                chart: {
+                    type: 'bar',
+                    height: '100%',
+                    width: calculatedWidth,
+                    fontFamily: 'Prompt, sans-serif',
+                    toolbar: { show: false },
+                    animations: { enabled: false },
+                    parentHeightOffset: 0,
+                    stacked: false,
+                    selection: { enabled: false },
+                    zoom: { enabled: false }
+                },
+                colors: ['#22c55e', '#ef4444'], // Green for Buy, Red for Sell
+                plotOptions: {
+                    bar: { 
+                        borderRadius: 4, 
+                        columnWidth: '80%', // Increased width to 80%
+                        dataLabels: { position: 'center' } 
+                    }
+                },
+                dataLabels: {
+                    enabled: true, 
+                    offsetY: 0,
+                    style: { fontSize: '12px', colors: ["#ffffff"], fontWeight: 700 }, // White text
+                    formatter: (val) => val > 0 ? val.toLocaleString() : ""
+                },
+                states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
+                legend: { show: false },
+                xaxis: {
+                    categories: categories,
+                    labels: {
+                        style: { fontSize: '16px', fontWeight: 700, colors: '#64748b' }, // Match style
+                        formatter: function(val) {
+                            if (!val) return "";
+                            // Check if it's a date string
+                            if (val.indexOf && val.indexOf('-') > -1) {
+                                const d = new Date(val);
+                                if (isNaN(d.getTime())) return val;
+                                return d.getDate();
+                            }
+                            return val; 
+                        }
+                    },
+                    tooltip: { enabled: false },
+                    axisBorder: { show: true }, axisTicks: { show: false }, crosshairs: { show: false }
+                },
+                yaxis: { show: false, min: 0, max: maxVal, tickAmount: 5 },
+                // Added Dashed Grid
+                grid: { 
+                    show: true, 
+                    borderColor: '#cbd5e1', 
+                    strokeDashArray: 4, 
+                    padding: { top: 0, bottom: 0, left: 20, right: 20 },
+                    xaxis: { lines: { show: true } },   // Show vertical lines
+                    yaxis: { lines: { show: true } }
+                }, 
+                tooltip: { enabled: false }, // No tooltip
+                annotations: {
+                    xaxis: centerIndex !== -1 ? [{
+                         // No blue line/label here to match user preference
+                    }] : []
+                }
+            });
+            charts.invMain.render();
+
+            if (isScrollable && centerIndex !== -1) {
+                setTimeout(() => {
+                    const containerWidth = scroller.clientWidth;
+                    const singleBarWidth = containerWidth / 5; 
+                    const centerPos = (centerIndex * singleBarWidth) - (containerWidth / 2) + (singleBarWidth / 2);
+                    scroller.scrollLeft = centerPos;
+                }, 200);
+            } else if (isScrollable) {
+                scroller.scrollLeft = 0;
+            }
         }
     </script>
 </body>
