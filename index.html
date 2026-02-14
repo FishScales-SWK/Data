@@ -855,6 +855,7 @@
             const isAllMonths = monthVal === 'all';
             
             let categories = [], data = [], scrollable = false;
+            let todayIndex = -1;
 
             if (!useMonth) {
                 const yearMap = {};
@@ -867,6 +868,9 @@
             } else {
                 const month = parseInt(monthVal);
                 const daysInMonth = new Date(yearVal, month, 0).getDate();
+                const today = new Date();
+                const isCurrentMonth = (today.getFullYear() === yearVal && (today.getMonth() + 1) === month);
+
                 for(let i=1; i<=daysInMonth; i++) {
                     const dateKey = `${yearVal}-${String(month).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                     const dayTotal = rawData.reduce((sum, item) => {
@@ -875,10 +879,13 @@
                     }, 0);
                     categories.push(String(i).padStart(2,'0'));
                     data.push(dayTotal);
+                    if (isCurrentMonth && i === today.getDate()) {
+                        todayIndex = i - 1;
+                    }
                 }
                 scrollable = true;
             }
-            renderApexChart(categories, data, scrollable, '#chart-daily-y', '#chart-daily-production', '#daily-chart-scroller', '#8b5cf6');
+            renderApexChart(categories, data, scrollable, '#chart-daily-y', '#chart-daily-production', '#daily-chart-scroller', '#8b5cf6', todayIndex);
         }
 
         function renderInventoryView() {
@@ -908,7 +915,7 @@
                 filtered.forEach(r => {
                     const d = parseDate(r.timestamp);
                     const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} น.`;
-                    const detailBtn = r.images && r.images.length > 0 ? `<button onclick='openAdminImageModal(${JSON.stringify(r.images)})' class="text-brand-600 hover:underline"><i class="fa-solid fa-circle-info"></i> ดูรายละเอียด</button>` : `<span class="text-gray-400">ดูรายละเอียด</span>`;
+                    const detailBtn = r.images && r.images.length > 0 ? `<button onclick='openAdminImageModal(${JSON.stringify(r.images)})' class="text-brand-600 hover:underline"><i class="fa-solid fa-circle-info"></i> ดูรายละเอียด</button>` : `<span class="text-gray-400">ไม่มีรูปภาพ</span>`;
                     const amountHtml = r.status === 'ขายออก' ? `<span class="text-blue-700 font-bold">${r.quantity.toLocaleString()} KG</span><div class="text-xs text-gray-500">(${r.bags ? r.bags.toLocaleString() : (r.quantity/10).toLocaleString()} กระสอบ)</div>` : `<span class="text-gray-800 font-bold">${r.quantity.toLocaleString()} KG</span>`;
                     tbody.innerHTML += `<tr class="border-b border-gray-50 hover:bg-gray-50"><td class="p-4 whitespace-nowrap">${ds}</td><td class="p-4"><div>${r.name}</div><span class="text-xs px-2 py-0.5 rounded border ${r.status==='ซื้อเข้า'?'bg-green-50 text-green-700':'bg-blue-50 text-blue-700'}">${r.status}</span></td><td class="p-4 text-center">${amountHtml}</td><td class="p-4 text-center">${detailBtn}</td><td class="p-4 text-center"><button onclick="handleInventoryOptions('${r.id}')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full mx-auto"><i class="fa-solid fa-gear"></i></button></td></tr>`;
                 });
@@ -931,6 +938,7 @@
             const isAllMonths = monthVal === 'all';
 
             let categories = [], buyData = [], sellData = [], scrollable = false;
+            let todayIndex = -1;
 
             if (!useMonth) {
                 const yearMap = {};
@@ -943,6 +951,9 @@
             } else {
                 const month = parseInt(monthVal);
                 const daysInMonth = new Date(yearVal, month, 0).getDate();
+                const today = new Date();
+                const isCurrentMonth = (today.getFullYear() === yearVal && (today.getMonth() + 1) === month);
+
                 for(let i=1; i<=daysInMonth; i++) {
                     const dayTotal = rawData.reduce((acc, r) => {
                         const d = parseDate(r.timestamp);
@@ -954,13 +965,16 @@
                     categories.push(String(i).padStart(2,'0'));
                     buyData.push(dayTotal.buy);
                     sellData.push(dayTotal.sell);
+                    if (isCurrentMonth && i === today.getDate()) {
+                        todayIndex = i - 1;
+                    }
                 }
                 scrollable = true;
             }
-            renderApexInventoryChart(categories, buyData, sellData, scrollable);
+            renderApexInventoryChart(categories, buyData, sellData, scrollable, todayIndex);
         }
 
-        function renderApexChart(categories, data, isScrollable, ySelector, mainSelector, scrollerSelector, color) {
+        function renderApexChart(categories, data, isScrollable, ySelector, mainSelector, scrollerSelector, color, centerIndex = -1) {
             let maxVal = Math.max(...data); maxVal = maxVal > 0 ? Math.ceil(maxVal / 10) * 10 : 10;
             if (charts.dailyProduction) charts.dailyProduction.destroy(); if (charts.dailyY) charts.dailyY.destroy();
             
@@ -986,10 +1000,21 @@
                 grid:{borderColor:'#cbd5e1',strokeDashArray:4,padding:{left:20,right:20}}
             });
             charts.dailyProduction.render();
-            if(isScrollable) scroller.scrollLeft = 0;
+            if(isScrollable) {
+                if(centerIndex !== -1) {
+                    setTimeout(() => {
+                        const containerWidth = scroller.clientWidth;
+                        const barWidth = scroller.clientWidth / 8;
+                        const centerPos = (centerIndex * barWidth) - (containerWidth / 2) + (barWidth / 2);
+                        scroller.scrollTo({left: centerPos, behavior: 'smooth'});
+                    }, 500);
+                } else {
+                    scroller.scrollLeft = 0;
+                }
+            }
         }
 
-        function renderApexInventoryChart(categories, buyData, sellData, isScrollable) {
+        function renderApexInventoryChart(categories, buyData, sellData, isScrollable, centerIndex = -1) {
             let maxVal = Math.max(...buyData, ...sellData); maxVal = maxVal > 0 ? Math.ceil(maxVal / 100) * 100 : 100;
             if (charts.invMain) charts.invMain.destroy(); if (charts.invY) charts.invY.destroy();
             
@@ -1016,7 +1041,18 @@
                 grid:{borderColor:'#cbd5e1',strokeDashArray:4,padding:{left:20,right:20}}, legend:{show:false}
             });
             charts.invMain.render();
-            if(isScrollable) scroller.scrollLeft = 0;
+            if(isScrollable) {
+                if(centerIndex !== -1) {
+                    setTimeout(() => {
+                        const containerWidth = scroller.clientWidth;
+                        const barWidth = scroller.clientWidth / 5;
+                        const centerPos = (centerIndex * barWidth) - (containerWidth / 2) + (barWidth / 2);
+                        scroller.scrollTo({left: centerPos, behavior: 'smooth'});
+                    }, 500);
+                } else {
+                    scroller.scrollLeft = 0;
+                }
+            }
         }
 
         // Init Hash Detection
