@@ -908,7 +908,7 @@
                 filtered.forEach(r => {
                     const d = parseDate(r.timestamp);
                     const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} น.`;
-                    const detailBtn = r.images && r.images.length > 0 ? `<button onclick='openAdminImageModal(${JSON.stringify(r.images)})' class="text-brand-600 hover:underline"><i class="fa-solid fa-circle-info"></i> ดูรายละเอียด</button>` : `<span class="text-gray-400">ไม่มีรูปภาพ</span>`;
+                    const detailBtn = r.images && r.images.length > 0 ? `<button onclick='openAdminImageModal(${JSON.stringify(r.images)})' class="text-brand-600 hover:underline"><i class="fa-solid fa-circle-info"></i> ดูรายละเอียด</button>` : `<span class="text-gray-400">ดูรายละเอียด</span>`;
                     const amountHtml = r.status === 'ขายออก' ? `<span class="text-blue-700 font-bold">${r.quantity.toLocaleString()} KG</span><div class="text-xs text-gray-500">(${r.bags ? r.bags.toLocaleString() : (r.quantity/10).toLocaleString()} กระสอบ)</div>` : `<span class="text-gray-800 font-bold">${r.quantity.toLocaleString()} KG</span>`;
                     tbody.innerHTML += `<tr class="border-b border-gray-50 hover:bg-gray-50"><td class="p-4 whitespace-nowrap">${ds}</td><td class="p-4"><div>${r.name}</div><span class="text-xs px-2 py-0.5 rounded border ${r.status==='ซื้อเข้า'?'bg-green-50 text-green-700':'bg-blue-50 text-blue-700'}">${r.status}</span></td><td class="p-4 text-center">${amountHtml}</td><td class="p-4 text-center">${detailBtn}</td><td class="p-4 text-center"><button onclick="handleInventoryOptions('${r.id}')" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full mx-auto"><i class="fa-solid fa-gear"></i></button></td></tr>`;
                 });
@@ -1027,3 +1027,4 @@
     </script>
 </body>
 </html>
+
