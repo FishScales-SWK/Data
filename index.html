@@ -87,9 +87,14 @@
 
             <!-- View 1: Production (ปริมาณสินค้า) -->
             <div id="view-production" class="min-h-full bg-gradient-to-br from-emerald-100 to-green-200 p-4 md:p-8 relative overflow-y-auto">
-                <button onclick="switchAdminTab('inventory')" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
-                    <i class="fa-solid fa-file-lines"></i> <span class="hidden sm:inline">รายงานสถานะสินค้า</span>
-                </button>
+                <div class="fixed top-4 right-4 md:top-8 md:right-8 z-50 flex gap-2 md:gap-3">
+                    <a href="https://fishscales-swk.github.io/M/" target="_blank" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> <span class="hidden sm:inline">ออกบิล</span>
+                    </a>
+                    <button onclick="switchAdminTab('inventory')" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines"></i> <span class="hidden sm:inline">รายงานสถานะสินค้า</span>
+                    </button>
+                </div>
                 <button onclick="closeAdminModal()" class="fixed top-4 left-4 z-50 bg-white/50 hover:bg-white p-3 rounded-full shadow-md transition text-gray-700"><i class="fa-solid fa-arrow-left"></i></button>
                 
                 <div class="max-w-7xl mx-auto space-y-8 pt-16 md:pt-10">
