@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบรายงานข้อมูลสินค้า - SWK FishScales</title>
+    <title>ระบบจัดการข้อมูลสินค้า - SWK FishScales</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Libraries สำหรับออกบิล -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/th.js"></script>
 
     <!-- Tailwind Config -->
     <script>
@@ -31,7 +38,7 @@
         body { font-family: 'Prompt', sans-serif; background-color: #f3f4f6; }
         
         /* Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
@@ -48,10 +55,10 @@
 </head>
 <body>
 
-    <!-- ปุ่มเปิด Dashboard (จำลอง - เผื่อกรณีปิด Modal ไปแล้วอยากเปิดใหม่) -->
+    <!-- ปุ่มเปิด Dashboard -->
     <div class="fixed bottom-8 right-8 z-40">
         <button onclick="openAdminModal()" class="bg-brand-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-brand-800 transition flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie"></i> เข้าสู่ระบบจัดการสินค้า
+            <i class="fa-solid fa-chart-pie"></i> เข้าสู่ระบบจัดการ
         </button>
     </div>
 
@@ -80,7 +87,7 @@
             </div>
 
             <!-- Loading Overlay -->
-            <div id="loading-overlay" class="absolute inset-0 bg-black/50 z-[55] hidden flex-col items-center justify-center text-white">
+            <div id="loading-overlay" class="absolute inset-0 bg-black/50 z-[150] hidden flex-col items-center justify-center text-white backdrop-blur-sm transition-opacity">
                 <div class="loader mb-4"></div>
                 <p id="loading-text" class="text-lg font-medium">กำลังดำเนินการ...</p>
             </div>
@@ -88,9 +95,9 @@
             <!-- View 1: Production (ปริมาณสินค้า) -->
             <div id="view-production" class="min-h-full bg-gradient-to-br from-emerald-100 to-green-200 p-4 md:p-8 relative overflow-y-auto">
                 <div class="fixed top-4 right-4 md:top-8 md:right-8 z-50 flex gap-2 md:gap-3">
-                    <a href="https://fishscales-swk.github.io/M/" target="_blank" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                    <button onclick="switchAdminTab('billing')" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
                         <i class="fa-solid fa-file-invoice-dollar"></i> <span class="hidden sm:inline">ออกบิล</span>
-                    </a>
+                    </button>
                     <button onclick="switchAdminTab('inventory')" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
                         <i class="fa-solid fa-file-lines"></i> <span class="hidden sm:inline">รายงานสถานะสินค้า</span>
                     </button>
@@ -194,8 +201,9 @@
 
             <!-- View 2: Inventory (สถานะสินค้า) -->
             <div id="view-inventory" class="min-h-full bg-gradient-to-br from-blue-100 to-indigo-200 p-4 md:p-8 relative overflow-y-auto hidden">
-                <button onclick="switchAdminTab('production')" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 bg-white/80 hover:bg-white text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-arrow-left"></i> กลับไปหน้าปริมาณสินค้า
+                <!-- ปรับปุ่มย้อนกลับมาไว้ด้านซ้ายบน -->
+                <button onclick="switchAdminTab('production')" class="fixed top-4 left-4 md:top-8 md:left-8 z-50 bg-white/80 hover:bg-white text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
                 </button>
                 
                 <div class="max-w-7xl mx-auto space-y-8 pt-16 md:pt-10">
@@ -332,20 +340,183 @@
                     </div>
                 </div>
             </div>
+
+            <!-- View 3: Billing (ระบบออกบิล) -->
+            <div id="view-billing" class="min-h-full bg-gray-50 p-4 md:p-8 relative overflow-y-auto hidden">
+                <div class="max-w-6xl mx-auto space-y-6">
+                    <!-- ปรับปุ่มย้อนกลับเป็นสีส้มและจัดเรียงปกติเพื่อไม่ให้ทับหัวข้อ -->
+                    <button onclick="switchAdminTab('production')" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
+                    </button>
+
+                    <!-- Header -->
+                    <div class="bg-white rounded-3xl shadow-md p-6 flex flex-col md:flex-row items-start md:items-center justify-between border-l-8 border-brand-500 relative gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-brand-100 text-brand-600 p-4 rounded-2xl shrink-0">
+                                <i class="fa-solid fa-file-invoice-dollar text-3xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl md:text-3xl font-bold text-gray-800 leading-tight">ระบบรายการออกบิล</h1>
+                                <p class="text-sm md:text-base text-gray-500">จัดการข้อมูลการซื้อเข้า - ขายออก และแหล่งที่มา</p>
+                            </div>
+                        </div>
+                        <button onclick="fetchData()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-3 rounded-full transition shadow-sm" title="รีเฟรชข้อมูล">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Form Section -->
+                    <div class="bg-white rounded-3xl shadow-md p-6 md:p-8">
+                        <form id="billing-form" onsubmit="saveBill(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- วันที่ -->
+                                <div class="space-y-2">
+                                    <label class="font-semibold text-gray-700">วันที่</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                            <i class="fa-regular fa-calendar text-gray-400"></i>
+                                        </div>
+                                        <input type="text" id="bill-date" required placeholder="โปรดเลือกวันที่" class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition bg-white">
+                                    </div>
+                                </div>
+
+                                <!-- สถานะ -->
+                                <div class="space-y-2">
+                                    <label class="font-semibold text-gray-700">สถานะ</label>
+                                    <select id="bill-type" required onchange="updateTypeColor(this)" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition font-medium">
+                                        <option value="" disabled selected>-- เลือกสถานะ --</option>
+                                        <option value="ซื้อเข้า" class="text-green-600">📦 ซื้อเข้า</option>
+                                        <option value="ขายออก" class="text-blue-600">🚛 ขายออก</option>
+                                    </select>
+                                </div>
+
+                                <!-- ชื่อ -->
+                                <div class="space-y-2">
+                                    <label class="font-semibold text-gray-700">ชื่อ</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <i class="fa-regular fa-user text-gray-400"></i>
+                                        </div>
+                                        <input type="text" id="bill-name" required placeholder="ระบุชื่อ..." class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition">
+                                    </div>
+                                </div>
+
+                                <!-- แหล่งที่มา -->
+                                <div class="space-y-2">
+                                    <label class="font-semibold text-gray-700">แหล่งที่มา (จังหวัด)</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <i class="fa-solid fa-location-dot text-gray-400"></i>
+                                        </div>
+                                        <input type="text" id="bill-province" list="province-list" required placeholder="พิมพ์ค้นหาจังหวัด..." class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition">
+                                        <datalist id="province-list"></datalist>
+                                    </div>
+                                </div>
+
+                                <!-- จำนวน -->
+                                <div class="space-y-2">
+                                    <label class="font-semibold text-gray-700">จำนวน (กิโลกรัม)</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <i class="fa-solid fa-weight-scale text-gray-400"></i>
+                                        </div>
+                                        <input type="number" id="bill-qty" step="0.01" required placeholder="0.00" class="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none transition">
+                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 font-bold">KG</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-gray-100 flex flex-col md:flex-row justify-end gap-3">
+                                <button type="button" id="btn-cancel-edit" onclick="cancelEditBill()" class="hidden w-full md:w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl shadow-md transform active:scale-95 transition-all text-center">
+                                    ยกเลิก
+                                </button>
+                                <button type="submit" id="btn-submit-bill" class="w-full md:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลบิล
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Table Section -->
+                    <div class="bg-white rounded-3xl shadow-md p-6 md:p-8">
+                        <div class="flex flex-wrap items-center justify-between mb-6 gap-2">
+                            <h3 class="text-lg md:text-xl font-bold text-gray-800 border-l-4 border-brand-500 pl-3">ประวัติการออกบิลล่าสุด</h3>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium" id="total-records">0 รายการ</span>
+                        </div>
+                        
+                        <div class="w-full">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200 hidden md:table-header-group">
+                                    <tr>
+                                        <th class="p-4 font-semibold text-center whitespace-nowrap">วันที่</th>
+                                        <th class="p-4 font-semibold text-center">ประเภท</th>
+                                        <th class="p-4 font-semibold text-center">ชื่อ</th>
+                                        <th class="p-4 font-semibold text-center">แหล่งที่มา</th>
+                                        <th class="p-4 font-semibold text-center">จำนวน (KG)</th>
+                                        <th class="p-4 font-semibold text-center">หมายเหตุ</th>
+                                        <th class="p-4 font-semibold text-center">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bill-table-body" class="md:divide-y md:divide-gray-100 block md:table-row-group">
+                                    <tr class="block md:table-row">
+                                        <td colspan="7" class="block md:table-cell p-8 text-center text-gray-400">กำลังโหลดข้อมูล...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- ปุ่มพิมพ์รายงานและโหลดไฟล์ PDF -->
+                        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+                            <button type="button" onclick="openPrintModal('pdf')" class="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-pdf"></i> โหลดไฟล์ PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <!-- Logic Script -->
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfxWs81WEsrizNnTi82tZAOH_EHX1hKnvUoqsARpYch3TTjEqz5oepiol_vWQ4lK3G0g/exec';
-        let appData = { records: [], production: [] };
+        
+        // Global State
+        let appData = { records: [], production: [], bills: [] };
         let charts = { production: null, inventory: null, dailyProduction: null, dailyY: null, invMain: null, invY: null };
         let currentInvImages = []; 
+        let editingBillId = null;
+        let printFpInstance = null;
+
+        // ข้อมูลจังหวัดสำหรับ Datalist
+        const thaiProvinces = [
+            "กรุงเทพมหานคร", "กระบี่", "กาญจนบุรี", "กาฬสินธุ์", "กำแพงเพชร", "ขอนแก่น", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ชัยนาท", 
+            "ชัยภูมิ", "ชุมพร", "เชียงราย", "เชียงใหม่", "ตรัง", "ตราด", "ตาก", "นครนายก", "นครปฐม", "นครพนม", "นครราชสีมา", 
+            "นครศรีธรรมราช", "นครสวรรค์", "นนทบุรี", "นราธิวาส", "น่าน", "บึงกาฬ", "บุรีรัมย์", "ปทุมธานี", "ประจวบคีรีขันธ์", "ปราจีนบุรี", 
+            "ปัตตานี", "พระนครศรีอยุธยา", "พะเยา", "พังงา", "พัทลุง", "พิจิตร", "พิษณุโลก", "เพชรบุรี", "เพชรบูรณ์", "แพร่", "ภูเก็ต", 
+            "มหาสารคาม", "มุกดาหาร", "แม่ฮ่องสอน", "ยโสธร", "ยะลา", "ร้อยเอ็ด", "ระนอง", "ระยอง", "ราชบุรี", "ลพบุรี", "ลำปาง", 
+            "ลำพูน", "เลย", "ศรีสะเกษ", "สกลนคร", "สงขลา", "สตูล", "สมุทรปราการ", "สมุทรสงคราม", "สมุทรสาคร", "สระแก้ว", "สระบุรี", 
+            "สิงห์บุรี", "สุโขทัย", "สุพรรณบุรี", "สุราษฎร์ธานี", "สุรินทร์", "หนองคาย", "หนองบัวลำภู", "อ่างทอง", "อำนาจเจริญ", "อุดรธานี", 
+            "อุตรดิตถ์", "อุทัยธานี", "อุบลราชธานี"
+        ];
 
         const getThaiMonthName = (m) => ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'][m-1];
         
+        // ฟังก์ชันแปลงวันที่ให้รองรับรูปแบบต่างๆ
         const parseDate = (str) => {
             if (!str) return new Date();
+            
+            // กรณีรับค่ามาเป็น YYYY-MM-DD ตรงๆ (ฝั่ง input date ของบิล)
+            if (typeof str === 'string' && str.match(/^\d{4}-\d{2}-\d{2}/)) {
+                const parts = str.split('T')[0].split('-');
+                let y = parseInt(parts[0]);
+                if (y > 2400) y -= 543;
+                return new Date(y, parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+
             const parts = str.match(/(\d+)/g);
             if (parts && parts.length >= 3) {
                 let p1 = parseInt(parts[0]), p2 = parseInt(parts[1]), p3 = parseInt(parts[2]);
@@ -370,6 +541,22 @@
             return Math.max(0, totalProd - totalSold);
         };
 
+        function showLoading(show, text = 'กำลังดำเนินการ...') {
+            const overlay = document.getElementById('loading-overlay');
+            const textEl = document.getElementById('loading-text');
+            if(show) {
+                textEl.innerText = text;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            } else {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }
+        }
+
+        // ==========================================
+        // Modal & View Management
+        // ==========================================
         function openAdminModal() {
             const m = document.getElementById('admin-modal');
             document.getElementById('admin-login-screen').classList.remove('hidden');
@@ -404,13 +591,162 @@
         function switchAdminTab(tabName) {
             document.getElementById('view-production').classList.add('hidden');
             document.getElementById('view-inventory').classList.add('hidden');
+            document.getElementById('view-billing').classList.add('hidden');
+            
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            
             setTimeout(() => {
                 if(tabName === 'production') { renderProductionView(); renderDailyProductionChart(); }
                 if(tabName === 'inventory') { renderInventoryView(); renderInventoryChart(); }
+                if(tabName === 'billing') { renderBillTable(); }
             }, 100);
         }
 
+        // ==========================================
+        // Data Fetching
+        // ==========================================
+        async function fetchData(silent = false) {
+            if (!silent) showLoading(true, 'กำลังโหลดข้อมูล...');
+            
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=load&t=${Date.now()}`);
+                const result = await response.json();
+                
+                if (result.success) { 
+                    // Load Production & Inventory
+                    if(result.data.production) {
+                        appData.production = result.data.production.map(r => ({
+                            ...r, 
+                            bags: parseInt(String(r.bags).replace(/,/g, '')) || 0, 
+                            kilos: parseInt(String(r.kilos).replace(/,/g, '')) || 0,
+                            accBags: r['สะสม'] ? parseInt(String(r['สะสม']).replace(/,/g, '')) : 0
+                        }));
+                    }
+                    
+                    if(result.data.records) {
+                        appData.records = result.data.records.map(r => {
+                            let imgs = [];
+                            if (r.images) { try { imgs = JSON.parse(r.images); } catch(e) { imgs = [r.images]; } }
+                            const cleanQty = String(r.quantity).replace(/,/g, '');
+                            const cleanBags = r.bags ? String(r.bags).replace(/,/g, '') : 0;
+                            return { ...r, quantity: parseFloat(cleanQty) || 0, bags: parseInt(cleanBags) || 0, images: imgs };
+                        });
+                    }
+
+                    // Load Bills (Sheet 'M')
+                    if(result.data.M) {
+                        appData.bills = result.data.M;
+                    }
+                    
+                    // Render Active Views
+                    if(!document.getElementById('view-production').classList.contains('hidden')) { renderProductionView(); renderDailyProductionChart(); }
+                    if(!document.getElementById('view-inventory').classList.contains('hidden')) { renderInventoryView(); renderInventoryChart(); }
+                    if(!document.getElementById('view-billing').classList.contains('hidden')) { renderBillTable(); }
+                }
+            } catch (error) { 
+                console.log('Fetch Failed', error);
+                if(!silent) Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 'error');
+            } finally { 
+                if (!silent) showLoading(false);
+            }
+        }
+
+        async function sendData(action, type, data) {
+            showLoading(true, 'กำลังบันทึกข้อมูล...');
+
+            try {
+                let simulatedId = "PENDING-" + Date.now(); 
+                let simulatedTimestamp;
+
+                if (action === 'edit' && data.timestamp) {
+                    simulatedId = data.id;
+                    simulatedTimestamp = data.timestamp;
+                } else {
+                    const now = new Date();
+                    const utcMs = now.getTime() + (7 * 60 * 60 * 1000);
+                    const thaiDate = new Date(utcMs);
+                    const d = String(thaiDate.getUTCDate()); 
+                    const m = String(thaiDate.getUTCMonth() + 1).padStart(2, '0');
+                    const y = thaiDate.getUTCFullYear() + 543; 
+                    const h = String(thaiDate.getUTCHours()).padStart(2, '0');
+                    const min = String(thaiDate.getUTCMinutes()).padStart(2, '0');
+                    const s = String(thaiDate.getUTCSeconds()).padStart(2, '0');
+                    simulatedTimestamp = `${d}/${m}/${y}, ${h}:${min}:${s}`;
+                }
+                
+                const payloadData = { ...data, timestamp: simulatedTimestamp };
+                
+                fetch(GOOGLE_SCRIPT_URL, { 
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ action, type, data: payloadData }), 
+                    headers: { 'Content-Type': 'application/json' } 
+                });
+
+                // UI Optimistic Update
+                if (type === 'Records') {
+                    if (action === 'edit') {
+                        const index = appData.records.findIndex(r => r.id === data.id);
+                        if (index !== -1) appData.records[index] = { ...appData.records[index], ...data };
+                    } else {
+                        appData.records.push({ id: simulatedId, timestamp: simulatedTimestamp, ...data });
+                    }
+                    renderInventoryView(); renderInventoryChart(); 
+                } else if (type === 'Production') {
+                    if (action === 'edit') {
+                        const index = appData.production.findIndex(r => r.id === data.id);
+                        if (index !== -1) appData.production[index] = { ...appData.production[index], ...data };
+                    } else {
+                        let latestAcc = 0;
+                        if (appData.production.length > 0) latestAcc = appData.production[appData.production.length - 1].accBags || 0; 
+                        appData.production.push({ id: simulatedId, timestamp: simulatedTimestamp, ...data, accBags: latestAcc + (parseInt(data.bags) || 0) });
+                    }
+                    renderProductionView(); renderDailyProductionChart(); 
+                }
+
+                showLoading(false);
+                Swal.fire({ title: 'สำเร็จ', text: 'บันทึกข้อมูลเรียบร้อยแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
+                setTimeout(() => { fetchData(true); }, 1500);
+
+            } catch (e) { 
+                Swal.fire('Error', e.message, 'error');
+                showLoading(false);
+            }
+        }
+
+        async function deleteData(id, type, skipConfirm = false) {
+            let password = '4455';
+            if (!skipConfirm) {
+                const result = await Swal.fire({ title: 'ยืนยันการลบ', input: 'password', inputLabel: 'กรุณากรอกรหัสผ่านเพื่อยืนยัน ', inputPlaceholder: 'รหัสผ่าน', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบข้อมูล', cancelButtonText: 'ยกเลิก' });
+                if (!result.isConfirmed) return;
+                password = result.value;
+            }
+
+            if (password === '4455') {
+                showLoading(true, 'กำลังลบข้อมูล...');
+                
+                if (id.toString().startsWith('PENDING-')) {
+                     if (type === 'Records') appData.records = appData.records.filter(r => r.id !== id);
+                     else appData.production = appData.production.filter(r => r.id !== id);
+                } else {
+                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', type, data: { id } }) });
+                    if (type === 'Records') appData.records = appData.records.filter(r => r.id !== id);
+                    else appData.production = appData.production.filter(r => r.id !== id);
+                }
+
+                if (type === 'Records') { renderInventoryView(); renderInventoryChart(); } 
+                else { renderProductionView(); renderDailyProductionChart(); }
+
+                showLoading(false);
+                if (!skipConfirm) Swal.fire({title: 'ลบข้อมูลสำเร็จ', icon: 'success', timer: 1000, showConfirmButton: false});
+            } else if (password) {
+                Swal.fire('รหัสผ่านไม่ถูกต้อง', '', 'error');
+            }
+        }
+
+
+        // ==========================================
+        // Production Functions
+        // ==========================================
         function populateFilterOptions() {
             const currentYear = new Date().getFullYear();
             const years = [];
@@ -458,6 +794,58 @@
             renderDailyProductionChart();
         }
 
+        function submitProduction() {
+            const qty = document.getElementById('input-prod-today').value;
+            if (!qty || qty <= 0) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุจำนวนกระสอบที่ถูกต้อง', icon: 'warning', confirmButtonColor: '#0ea5e9'});
+            Swal.fire({ title: 'ยืนยันการบันทึก', html: `<p class="text-lg">จำนวน: <b>${qty}</b> กระสอบ</p><p class="text-sm text-gray-500">(${qty * 10} กิโลกรัม)</p>`, icon: 'question', showCancelButton: true, confirmButtonColor: '#059669', confirmButtonText: 'ยืนยัน' }).then((result) => {
+                if (result.isConfirmed) {
+                    sendData('add', 'Production', { bags: parseInt(qty), kilos: parseInt(qty) * 10 });
+                    document.getElementById('input-prod-today').value = '';
+                }
+            });
+        }
+
+        async function handleProductionOptions(id) {
+            const record = appData.production.find(r => r.id === id);
+            if (!record) return;
+            const { value: password } = await Swal.fire({ title: 'ยืนยันตัวตน', input: 'password', inputLabel: 'กรุณากรอกรหัสผ่าน ', inputPlaceholder: 'รหัสผ่าน', showCancelButton: true, confirmButtonColor: '#0ea5e9', confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก' });
+            if (password !== '4455') { if (password) Swal.fire('รหัสผ่านไม่ถูกต้อง', '', 'error'); return; }
+            const { isConfirmed, isDenied } = await Swal.fire({ title: 'จัดการรายการ', text: 'เลือกการดำเนินการที่ต้องการ', icon: 'info', showDenyButton: true, showCancelButton: true, confirmButtonText: '<i class="fa-solid fa-pen-to-square"></i> แก้ไข', confirmButtonColor: '#f59e0b', denyButtonText: '<i class="fa-solid fa-trash-can"></i> ลบ', denyButtonColor: '#ef4444', cancelButtonText: 'ยกเลิก', reverseButtons: true });
+            if (isDenied) deleteData(id, 'Production', true);
+            else if (isConfirmed) openEditProductionModal(record);
+        }
+
+        function openEditProductionModal(record) {
+            const d = parseDate(record.timestamp);
+            const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+            Swal.fire({
+                title: 'แก้ไขรายการผลิต',
+                html: `<div class="flex flex-col gap-4 text-left"><div><label class="block text-sm font-bold text-gray-700 mb-1">วันที่</label><input type="date" id="edit-date" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-brand-500" value="${dateStr}"></div><div><label class="block text-sm font-bold text-gray-700 mb-1">เวลา</label><input type="time" id="edit-time" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-brand-500" value="${timeStr}"></div><div><label class="block text-sm font-bold text-gray-700 mb-1">จำนวน (กระสอบ)</label><input type="number" id="edit-bags" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-brand-500" value="${record.bags}"></div></div>`,
+                showCancelButton: true, confirmButtonText: 'บันทึกการแก้ไข', confirmButtonColor: '#059669', cancelButtonText: 'ยกเลิก',
+                preConfirm: () => {
+                    const newDate = document.getElementById('edit-date').value;
+                    const newTime = document.getElementById('edit-time').value;
+                    const newBags = document.getElementById('edit-bags').value;
+                    if(!newDate || !newTime || !newBags) Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ');
+                    return { newDate, newTime, newBags };
+                }
+            }).then((result) => { if (result.isConfirmed) saveProductionEdit(record.id, result.value); });
+        }
+
+        function saveProductionEdit(id, values) {
+            const { newDate, newTime, newBags } = values;
+            const [y, m, d] = newDate.split('-').map(Number);
+            const thaiYear = y + 543;
+            const [hr, min] = newTime.split(':');
+            const newTimestamp = `${d}/${String(m).padStart(2,'0')}/${thaiYear}, ${hr}:${min}:00`;
+            sendData('edit', 'Production', { id: id, timestamp: newTimestamp, bags: parseInt(newBags), kilos: parseInt(newBags) * 10 });
+        }
+
+
+        // ==========================================
+        // Inventory Functions
+        // ==========================================
         function toggleInvChartFilters() {
             const checked = document.getElementById('chk-inv-chart-month').checked;
             document.getElementById('inv-chart-filter-year').disabled = !checked;
@@ -551,137 +939,40 @@
 
         function closeAdminImageModal() { document.getElementById('admin-image-modal').classList.add('hidden'); }
 
-        async function fetchData(silent = false) {
-            const overlay = document.getElementById('loading-overlay');
-            if (!silent && overlay.classList.contains('hidden')) { overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
+        function submitInventory(e) {
+            e.preventDefault();
+            const type = document.getElementById('inv-type').value;
+            let name = document.getElementById('inv-name').value;
+            let inputQty = parseFloat(document.getElementById('inv-qty').value); 
             
-            try {
-                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=load&t=${Date.now()}`);
-                const result = await response.json();
-                if (result.success) { 
-                    appData.production = result.data.production.map(r => ({
-                        ...r, 
-                        bags: parseInt(String(r.bags).replace(/,/g, '')) || 0, 
-                        kilos: parseInt(String(r.kilos).replace(/,/g, '')) || 0,
-                        accBags: r['สะสม'] ? parseInt(String(r['สะสม']).replace(/,/g, '')) : 0
-                    }));
-                    
-                    appData.records = result.data.records.map(r => {
-                        let imgs = [];
-                        if (r.images) { try { imgs = JSON.parse(r.images); } catch(e) { imgs = [r.images]; } }
-                        const cleanQty = String(r.quantity).replace(/,/g, '');
-                        const cleanBags = r.bags ? String(r.bags).replace(/,/g, '') : 0;
-                        return { ...r, quantity: parseFloat(cleanQty) || 0, bags: parseInt(cleanBags) || 0, images: imgs };
-                    });
-                    
-                    if(!document.getElementById('view-production').classList.contains('hidden')) { renderProductionView(); renderDailyProductionChart(); }
-                    if(!document.getElementById('view-inventory').classList.contains('hidden')) { renderInventoryView(); renderInventoryChart(); }
-                }
-            } catch (error) { console.log('Fetch Failed', error); } 
-            finally { 
-                if (!silent) { overlay.classList.add('hidden'); overlay.classList.remove('flex'); document.getElementById('loading-text').innerText = 'กำลังดำเนินการ...'; }
+            if (!type || !name) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณากรอกข้อมูลให้ครบ', icon: 'warning', confirmButtonColor: '#0ea5e9'});
+            
+            let bagsVal = 0;
+            let displayHtml = '';
+
+            if (type === 'ขายออก') {
+                const inputBags = parseInt(document.getElementById('inv-bags-input').value);
+                if (!inputBags || inputBags <= 0) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุจำนวนกระสอบที่ขาย', icon: 'warning', confirmButtonColor: '#0ea5e9'});
+                if (!inputQty) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุน้ำหนักจริง', icon: 'warning', confirmButtonColor: '#0ea5e9'});
+                const stockBags = calculateReadyStockBags();
+                if (inputBags > stockBags) return Swal.fire({ title: 'สต็อกไม่เพียงพอ', text: `สินค้ามีเพียง ${stockBags.toLocaleString()} กระสอบ ไม่สามารถขายออก ${inputBags.toLocaleString()} กระสอบได้`, icon: 'error', confirmButtonColor: '#0ea5e9' }); 
+                bagsVal = inputBags;
+                displayHtml = `<div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-2"><p class="text-xl font-bold text-blue-900 mb-1">ขายออก: ${inputBags.toLocaleString()} กระสอบ</p><p class="text-gray-600">น้ำหนักจริง: ${inputQty.toLocaleString()} กิโลกรัม</p></div>`;
+            } else {
+                if (!inputQty) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุจำนวนกิโลกรัม', icon: 'warning', confirmButtonColor: '#0ea5e9'});
+                displayHtml = `<p class="text-lg">ซื้อเข้า: <b>${inputQty.toLocaleString()}</b> กิโลกรัม</p>`;
             }
-        }
 
-        async function sendData(action, type, data) {
-            const overlay = document.getElementById('loading-overlay');
-            document.getElementById('loading-text').innerText = 'กำลังบันทึกข้อมูล...';
-            overlay.classList.remove('hidden'); overlay.classList.add('flex');
-
-            try {
-                let simulatedId = "PENDING-" + Date.now(); 
-                let simulatedTimestamp;
-
-                if (action === 'edit' && data.timestamp) {
-                    simulatedId = data.id;
-                    simulatedTimestamp = data.timestamp;
-                } else {
-                    const now = new Date();
-                    const utcMs = now.getTime() + (7 * 60 * 60 * 1000);
-                    const thaiDate = new Date(utcMs);
-                    const d = String(thaiDate.getUTCDate()); 
-                    const m = String(thaiDate.getUTCMonth() + 1).padStart(2, '0');
-                    const y = thaiDate.getUTCFullYear() + 543; 
-                    const h = String(thaiDate.getUTCHours()).padStart(2, '0');
-                    const min = String(thaiDate.getUTCMinutes()).padStart(2, '0');
-                    const s = String(thaiDate.getUTCSeconds()).padStart(2, '0');
-                    simulatedTimestamp = `${d}/${m}/${y}, ${h}:${min}:${s}`;
+            Swal.fire({ title: 'ยืนยันการบันทึก', html: displayHtml, icon: 'question', showCancelButton: true, confirmButtonColor: '#059669', confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก' }).then((result) => {
+                if (result.isConfirmed) {
+                    sendData('add', 'Records', { status: type, name: name, quantity: inputQty, bags: bagsVal, images: currentInvImages });
+                    e.target.reset();
+                    document.getElementById('image-preview-container').innerHTML = '';
+                    document.getElementById('image-upload-placeholder').classList.remove('hidden');
+                    document.getElementById('inv-bags-container').classList.add('hidden'); 
+                    currentInvImages = [];
                 }
-                
-                const payloadData = { ...data, timestamp: simulatedTimestamp };
-                
-                fetch(GOOGLE_SCRIPT_URL, { 
-                    method: 'POST', mode: 'no-cors',
-                    body: JSON.stringify({ action, type, data: payloadData }), 
-                    headers: { 'Content-Type': 'application/json' } 
-                });
-
-                // UI Optimistic Update
-                if (type === 'Records') {
-                    if (action === 'edit') {
-                        const index = appData.records.findIndex(r => r.id === data.id);
-                        if (index !== -1) appData.records[index] = { ...appData.records[index], ...data };
-                    } else {
-                        appData.records.push({ id: simulatedId, timestamp: simulatedTimestamp, ...data });
-                    }
-                    renderInventoryView(); renderInventoryChart(); 
-                } else if (type === 'Production') {
-                    if (action === 'edit') {
-                        const index = appData.production.findIndex(r => r.id === data.id);
-                        if (index !== -1) appData.production[index] = { ...appData.production[index], ...data };
-                    } else {
-                        let latestAcc = 0;
-                        if (appData.production.length > 0) latestAcc = appData.production[appData.production.length - 1].accBags || 0; 
-                        appData.production.push({ id: simulatedId, timestamp: simulatedTimestamp, ...data, accBags: latestAcc + (parseInt(data.bags) || 0) });
-                    }
-                    renderProductionView(); renderDailyProductionChart(); 
-                }
-
-                overlay.classList.add('hidden'); overlay.classList.remove('flex');
-                Swal.fire({ title: 'สำเร็จ', text: 'บันทึกข้อมูลเรียบร้อยแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
-                setTimeout(() => { fetchData(true); }, 1500);
-
-            } catch (e) { 
-                Swal.fire('Error', e.message, 'error');
-                overlay.classList.add('hidden'); overlay.classList.remove('flex');
-            }
-        }
-
-        async function handleProductionOptions(id) {
-            const record = appData.production.find(r => r.id === id);
-            if (!record) return;
-            const { value: password } = await Swal.fire({ title: 'ยืนยันตัวตน', input: 'password', inputLabel: 'กรุณากรอกรหัสผ่าน ', inputPlaceholder: 'รหัสผ่าน', showCancelButton: true, confirmButtonColor: '#0ea5e9', confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก' });
-            if (password !== '4455') { if (password) Swal.fire('รหัสผ่านไม่ถูกต้อง', '', 'error'); return; }
-            const { isConfirmed, isDenied } = await Swal.fire({ title: 'จัดการรายการ', text: 'เลือกการดำเนินการที่ต้องการ', icon: 'info', showDenyButton: true, showCancelButton: true, confirmButtonText: '<i class="fa-solid fa-pen-to-square"></i> แก้ไข', confirmButtonColor: '#f59e0b', denyButtonText: '<i class="fa-solid fa-trash-can"></i> ลบ', denyButtonColor: '#ef4444', cancelButtonText: 'ยกเลิก', reverseButtons: true });
-            if (isDenied) deleteData(id, 'Production', true);
-            else if (isConfirmed) openEditProductionModal(record);
-        }
-
-        function openEditProductionModal(record) {
-            const d = parseDate(record.timestamp);
-            const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-            const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-            Swal.fire({
-                title: 'แก้ไขรายการผลิต',
-                html: `<div class="flex flex-col gap-4 text-left"><div><label class="block text-sm font-bold text-gray-700 mb-1">วันที่</label><input type="date" id="edit-date" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-brand-500" value="${dateStr}"></div><div><label class="block text-sm font-bold text-gray-700 mb-1">เวลา</label><input type="time" id="edit-time" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-brand-500" value="${timeStr}"></div><div><label class="block text-sm font-bold text-gray-700 mb-1">จำนวน (กระสอบ)</label><input type="number" id="edit-bags" class="w-full border border-gray-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-brand-500" value="${record.bags}"></div></div>`,
-                showCancelButton: true, confirmButtonText: 'บันทึกการแก้ไข', confirmButtonColor: '#059669', cancelButtonText: 'ยกเลิก',
-                preConfirm: () => {
-                    const newDate = document.getElementById('edit-date').value;
-                    const newTime = document.getElementById('edit-time').value;
-                    const newBags = document.getElementById('edit-bags').value;
-                    if(!newDate || !newTime || !newBags) Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ');
-                    return { newDate, newTime, newBags };
-                }
-            }).then((result) => { if (result.isConfirmed) saveProductionEdit(record.id, result.value); });
-        }
-
-        function saveProductionEdit(id, values) {
-            const { newDate, newTime, newBags } = values;
-            const [y, m, d] = newDate.split('-').map(Number);
-            const thaiYear = y + 543;
-            const [hr, min] = newTime.split(':');
-            const newTimestamp = `${d}/${String(m).padStart(2,'0')}/${thaiYear}, ${hr}:${min}:00`;
-            sendData('edit', 'Production', { id: id, timestamp: newTimestamp, bags: parseInt(newBags), kilos: parseInt(newBags) * 10 });
+            });
         }
 
         async function handleInventoryOptions(id) {
@@ -726,88 +1017,456 @@
             sendData('edit', 'Records', { id: id, timestamp: newTimestamp, quantity: parseFloat(newQty), bags: parseInt(newBags) || 0 });
         }
 
-        async function deleteData(id, type, skipConfirm = false) {
-            let password = '4455';
-            if (!skipConfirm) {
-                const result = await Swal.fire({ title: 'ยืนยันการลบ', input: 'password', inputLabel: 'กรุณากรอกรหัสผ่านเพื่อยืนยัน ', inputPlaceholder: 'รหัสผ่าน', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบข้อมูล', cancelButtonText: 'ยกเลิก' });
-                if (!result.isConfirmed) return;
-                password = result.value;
-            }
 
-            if (password === '4455') {
-                const overlay = document.getElementById('loading-overlay');
-                document.getElementById('loading-text').innerText = 'กำลังลบข้อมูล...';
-                overlay.classList.remove('hidden'); overlay.classList.add('flex');
+        // ==========================================
+        // Billing Functions (Sheet 'M')
+        // ==========================================
+        function initBilling() {
+            // Setup Flatpickr for Bill form
+            flatpickr("#bill-date", {
+                dateFormat: "Y-m-d", 
+                altInput: true,
+                altFormat: "d/m/Y",  
+                locale: "th",
+                formatDate: (date, formatStr) => {
+                    if (formatStr === "d/m/Y") {
+                        const d = String(date.getDate()).padStart(2, '0');
+                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                        const y = date.getFullYear() + 543;
+                        return `${d}/${m}/${y}`;
+                    }
+                    const d = String(date.getDate()).padStart(2, '0');
+                    const m = String(date.getMonth() + 1).padStart(2, '0');
+                    const y = date.getFullYear();
+                    return `${y}-${m}-${d}`;
+                },
+                onReady: function(selectedDates, dateStr, instance) {
+                    if (instance.currentYearElement) instance.currentYearElement.value = instance.currentYear + 543;
+                },
+                onYearChange: function(selectedDates, dateStr, instance) {
+                    if (instance.currentYearElement) instance.currentYearElement.value = instance.currentYear + 543;
+                },
+                onMonthChange: function(selectedDates, dateStr, instance) {
+                    if (instance.currentYearElement) instance.currentYearElement.value = instance.currentYear + 543;
+                }
+            });
+            
+            // Populate Provinces
+            const provinceList = document.getElementById('province-list');
+            if (provinceList && provinceList.childElementCount === 0) {
+                thaiProvinces.forEach(prov => {
+                    const option = document.createElement('option');
+                    option.value = prov;
+                    provinceList.appendChild(option);
+                });
+            }
+        }
+
+        function updateTypeColor(selectElement) {
+            selectElement.classList.remove('bg-green-50', 'bg-blue-50', 'text-green-700', 'text-blue-700');
+            const nameInput = document.getElementById('bill-name');
+            const provinceInput = document.getElementById('bill-province');
+
+            if (selectElement.value === 'ซื้อเข้า') {
+                selectElement.classList.add('bg-green-50', 'text-green-700');
+                if (nameInput.value === 'บจก.อุตสาหกรรมกระดูกสัตว์') nameInput.value = '';
+                if (provinceInput.value === '-') provinceInput.value = '';
                 
-                if (id.toString().startsWith('PENDING-')) {
-                     // Smart Delete logic for pending items... (simplified for brevity)
-                     const dataArray = (type === 'Records') ? appData.records : appData.production;
-                     if (type === 'Records') appData.records = appData.records.filter(r => r.id !== id);
-                     else appData.production = appData.production.filter(r => r.id !== id);
-                } else {
-                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', type, data: { id } }) });
-                    if (type === 'Records') appData.records = appData.records.filter(r => r.id !== id);
-                    else appData.production = appData.production.filter(r => r.id !== id);
-                }
-
-                if (type === 'Records') { renderInventoryView(); renderInventoryChart(); } 
-                else { renderProductionView(); renderDailyProductionChart(); }
-
-                overlay.classList.add('hidden'); overlay.classList.remove('flex');
-                if (!skipConfirm) Swal.fire({title: 'ลบข้อมูลสำเร็จ', icon: 'success', timer: 1000, showConfirmButton: false});
-            } else if (password) {
-                Swal.fire('รหัสผ่านไม่ถูกต้อง', '', 'error');
+                nameInput.readOnly = false;
+                provinceInput.readOnly = false;
+                nameInput.classList.remove('bg-gray-100');
+                provinceInput.classList.remove('bg-gray-100');
+            } else if (selectElement.value === 'ขายออก') {
+                selectElement.classList.add('bg-blue-50', 'text-blue-700');
+                nameInput.value = 'บจก.อุตสาหกรรมกระดูกสัตว์';
+                provinceInput.value = '-';
+                
+                nameInput.readOnly = true;
+                provinceInput.readOnly = true;
+                nameInput.classList.add('bg-gray-100');
+                provinceInput.classList.add('bg-gray-100');
             }
         }
 
-        function submitProduction() {
-            const qty = document.getElementById('input-prod-today').value;
-            if (!qty || qty <= 0) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุจำนวนกระสอบที่ถูกต้อง', icon: 'warning', confirmButtonColor: '#0ea5e9'});
-            Swal.fire({ title: 'ยืนยันการบันทึก', html: `<p class="text-lg">จำนวน: <b>${qty}</b> กระสอบ</p><p class="text-sm text-gray-500">(${qty * 10} กิโลกรัม)</p>`, icon: 'question', showCancelButton: true, confirmButtonColor: '#059669', confirmButtonText: 'ยืนยัน' }).then((result) => {
-                if (result.isConfirmed) {
-                    sendData('add', 'Production', { bags: parseInt(qty), kilos: parseInt(qty) * 10 });
-                    document.getElementById('input-prod-today').value = '';
-                }
-            });
-        }
-
-        function submitInventory(e) {
+        async function saveBill(e) {
             e.preventDefault();
-            const type = document.getElementById('inv-type').value;
-            let name = document.getElementById('inv-name').value;
-            let inputQty = parseFloat(document.getElementById('inv-qty').value); 
-            
-            if (!type || !name) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณากรอกข้อมูลให้ครบ', icon: 'warning', confirmButtonColor: '#0ea5e9'});
-            
-            let bagsVal = 0;
-            let displayHtml = '';
 
-            if (type === 'ขายออก') {
-                const inputBags = parseInt(document.getElementById('inv-bags-input').value);
-                if (!inputBags || inputBags <= 0) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุจำนวนกระสอบที่ขาย', icon: 'warning', confirmButtonColor: '#0ea5e9'});
-                if (!inputQty) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุน้ำหนักจริง', icon: 'warning', confirmButtonColor: '#0ea5e9'});
-                const stockBags = calculateReadyStockBags();
-                if (inputBags > stockBags) return Swal.fire({ title: 'สต็อกไม่เพียงพอ', text: `สินค้ามีเพียง ${stockBags.toLocaleString()} กระสอบ ไม่สามารถขายออก ${inputBags.toLocaleString()} กระสอบได้`, icon: 'error', confirmButtonColor: '#0ea5e9' }); 
-                bagsVal = inputBags;
-                displayHtml = `<div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-2"><p class="text-xl font-bold text-blue-900 mb-1">ขายออก: ${inputBags.toLocaleString()} กระสอบ</p><p class="text-gray-600">น้ำหนักจริง: ${inputQty.toLocaleString()} กิโลกรัม</p></div>`;
-            } else {
-                if (!inputQty) return Swal.fire({title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุจำนวนกิโลกรัม', icon: 'warning', confirmButtonColor: '#0ea5e9'});
-                displayHtml = `<p class="text-lg">ซื้อเข้า: <b>${inputQty.toLocaleString()}</b> กิโลกรัม</p>`;
+            const dateValRaw = document.getElementById('bill-date').value; 
+            
+            if (!dateValRaw) {
+                Swal.fire({ title: 'กรุณาเลือกวันที่', text: 'โปรดเลือกวันที่ก่อนทำการบันทึกข้อมูล', icon: 'warning', confirmButtonColor: '#0ea5e9' });
+                return; 
             }
 
-            Swal.fire({ title: 'ยืนยันการบันทึก', html: displayHtml, icon: 'question', showCancelButton: true, confirmButtonColor: '#059669', confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก' }).then((result) => {
+            const typeVal = document.getElementById('bill-type').value;
+            let saveDateStr = "";
+            let remarkVal = "";
+            
+            if (dateValRaw) {
+                const [y, m, d] = dateValRaw.split('-');
+                const yearBE = parseInt(y) + 543;
+                saveDateStr = `${d}-${m}-${yearBE}`; 
+                
+                if (typeVal === 'ขายออก') {
+                    remarkVal = `LOT${d}-${m}-${yearBE}`;
+                }
+            }
+
+            const billData = {
+                date: saveDateStr, 
+                type: typeVal,
+                name: document.getElementById('bill-name').value,
+                province: document.getElementById('bill-province').value,
+                quantity: parseFloat(document.getElementById('bill-qty').value),
+                remark: remarkVal 
+            };
+
+            showLoading(true, 'กำลังบันทึกข้อมูล...');
+
+            try {
+                if (editingBillId) {
+                    billData.id = editingBillId;
+                    
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'edit', type: 'M', data: billData })
+                    }).catch(console.error);
+                    
+                    const index = appData.bills.findIndex(b => b.id === editingBillId);
+                    if (index !== -1) {
+                        appData.bills[index] = { ...appData.bills[index], ...billData };
+                    }
+                    
+                    setTimeout(() => {
+                        showLoading(false);
+                        Swal.fire({ title: 'อัปเดตสำเร็จ!', text: 'แก้ไขรายการบิลเรียบร้อยแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
+                        cancelEditBill(); 
+                        renderBillTable();
+                        setTimeout(() => fetchData(true), 1500); 
+                    }, 300);
+                    
+                } else {
+                    billData.id = "PENDING-" + Date.now(); 
+                    
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'add', type: 'M', data: billData })
+                    }).catch(console.error);
+
+                    appData.bills.unshift(billData); 
+                    
+                    setTimeout(() => {
+                        showLoading(false);
+                        Swal.fire({ title: 'บันทึกสำเร็จ!', text: 'เพิ่มรายการบิลเรียบร้อยแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
+                        
+                        document.getElementById('bill-date')._flatpickr.clear();
+                        document.getElementById('bill-type').value = "";
+                        document.getElementById('bill-type').classList.remove('bg-green-50', 'bg-blue-50', 'text-green-700', 'text-blue-700');
+                        document.getElementById('bill-name').value = "";
+                        document.getElementById('bill-province').value = "";
+                        document.getElementById('bill-qty').value = "";
+                        
+                        document.getElementById('bill-name').readOnly = false;
+                        document.getElementById('bill-province').readOnly = false;
+                        document.getElementById('bill-name').classList.remove('bg-gray-100');
+                        document.getElementById('bill-province').classList.remove('bg-gray-100');
+                        
+                        renderBillTable();
+                        setTimeout(() => fetchData(true), 1500);
+                    }, 300);
+                }
+            } catch (error) {
+                showLoading(false);
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่', 'error');
+            }
+        }
+
+        function editBill(id) {
+            const bill = appData.bills.find(b => b.id === id);
+            if (!bill) return;
+
+            editingBillId = id;
+            
+            const dObj = parseDate(bill.date);
+            if (!isNaN(dObj.getTime())) {
+                const yyyy = dObj.getFullYear();
+                const mm = String(dObj.getMonth() + 1).padStart(2, '0');
+                const dd = String(dObj.getDate()).padStart(2, '0');
+                document.getElementById('bill-date')._flatpickr.setDate(`${yyyy}-${mm}-${dd}`);
+            }
+
+            document.getElementById('bill-type').value = bill.type;
+            updateTypeColor(document.getElementById('bill-type'));
+            document.getElementById('bill-name').value = bill.name;
+            document.getElementById('bill-province').value = bill.province;
+            document.getElementById('bill-qty').value = bill.quantity;
+
+            const btnSubmit = document.getElementById('btn-submit-bill');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> อัปเดตข้อมูลบิล';
+            btnSubmit.classList.remove('bg-brand-600', 'hover:bg-brand-700');
+            btnSubmit.classList.add('bg-amber-500', 'hover:bg-amber-600');
+            
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            document.getElementById('view-billing').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditBill() {
+            editingBillId = null;
+            document.getElementById('billing-form').reset();
+            document.getElementById('bill-date')._flatpickr.clear();
+            document.getElementById('bill-type').classList.remove('bg-green-50', 'bg-blue-50', 'text-green-700', 'text-blue-700');
+            
+            document.getElementById('bill-name').readOnly = false;
+            document.getElementById('bill-province').readOnly = false;
+            document.getElementById('bill-name').classList.remove('bg-gray-100');
+            document.getElementById('bill-province').classList.remove('bg-gray-100');
+            
+            const btnSubmit = document.getElementById('btn-submit-bill');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลบิล';
+            btnSubmit.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+            btnSubmit.classList.add('bg-brand-600', 'hover:bg-brand-700');
+            
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+
+        function deleteBill(id) {
+            Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: "คุณต้องการลบรายการบิลนี้ใช่หรือไม่?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#9ca3af',
+                confirmButtonText: 'ลบทิ้ง',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    sendData('add', 'Records', { status: type, name: name, quantity: inputQty, bags: bagsVal, images: currentInvImages });
-                    e.target.reset();
-                    document.getElementById('image-preview-container').innerHTML = '';
-                    document.getElementById('image-upload-placeholder').classList.remove('hidden');
-                    document.getElementById('inv-bags-container').classList.add('hidden'); 
-                    currentInvImages = [];
+                    showLoading(true, 'กำลังลบข้อมูล...');
+                    
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', type: 'M', data: { id: id } })
+                    }).catch(console.error);
+
+                    setTimeout(() => {
+                        showLoading(false);
+                        appData.bills = appData.bills.filter(b => b.id !== id);
+                        renderBillTable();
+                        Swal.fire({ title: 'ลบสำเร็จ', icon: 'success', timer: 1000, showConfirmButton: false });
+                    }, 300);
                 }
             });
         }
 
-        // Render Functions
+        function openPrintModal(actionType = 'print') {
+            const isPdf = actionType === 'pdf';
+            const titleText = isPdf ? 'เลือกช่วงวันที่สร้าง PDF' : 'เลือกช่วงวันที่ (สำหรับพิมพ์)';
+            const btnText = isPdf ? '<i class="fa-solid fa-file-pdf"></i> เปิดพรีวิวและปริ้น' : '<i class="fa-solid fa-print"></i> ปริ้นรายงาน';
+            const btnColor = isPdf ? '#ef4444' : '#4f46e5';
+
+            Swal.fire({
+                title: titleText,
+                html: `
+                    <div class="mt-4 text-left">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">ระบุช่วงวันที่ต้องการ</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                <i class="fa-regular fa-calendar text-gray-400"></i>
+                            </div>
+                            <input type="text" id="print-date-range" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="โปรดเลือกช่วงวันที่">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">* คลิกเพื่อเลือกวันเริ่มต้น และคลุมไปยังวันสิ้นสุด</p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: btnText,
+                confirmButtonColor: btnColor,
+                cancelButtonText: 'ยกเลิก',
+                didOpen: () => {
+                    printFpInstance = flatpickr("#print-date-range", {
+                        mode: "range",
+                        dateFormat: "Y-m-d", 
+                        altInput: true,
+                        altFormat: "d/m/Y",  
+                        locale: "th",
+                        formatDate: (date, formatStr) => {
+                            if (formatStr === "d/m/Y") {
+                                const d = String(date.getDate()).padStart(2, '0');
+                                const m = String(date.getMonth() + 1).padStart(2, '0');
+                                const y = date.getFullYear() + 543;
+                                return `${d}/${m}/${y}`;
+                            }
+                            const d = String(date.getDate()).padStart(2, '0');
+                            const m = String(date.getMonth() + 1).padStart(2, '0');
+                            const y = date.getFullYear();
+                            return `${y}-${m}-${d}`;
+                        },
+                        onReady: function(selectedDates, dateStr, instance) {
+                            if (instance.currentYearElement) instance.currentYearElement.value = instance.currentYear + 543;
+                        },
+                        onYearChange: function(selectedDates, dateStr, instance) {
+                            if (instance.currentYearElement) instance.currentYearElement.value = instance.currentYear + 543;
+                        },
+                        onMonthChange: function(selectedDates, dateStr, instance) {
+                            if (instance.currentYearElement) instance.currentYearElement.value = instance.currentYear + 543;
+                        }
+                    });
+                },
+                preConfirm: () => {
+                    if (!printFpInstance || printFpInstance.selectedDates.length === 0) {
+                        Swal.showValidationMessage('กรุณาเลือกช่วงวันที่ให้ครบถ้วน');
+                        return false;
+                    }
+                    const selectedDates = printFpInstance.selectedDates;
+                    const startObj = selectedDates[0];
+                    const endObj = selectedDates.length > 1 ? selectedDates[1] : selectedDates[0]; 
+                    return { startObj, endObj, actionType };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    executePrint(result.value.startObj, result.value.endObj, result.value.actionType);
+                }
+            });
+        }
+
+        function executePrint(startObj, endObj, actionType) {
+            startObj.setHours(0, 0, 0, 0);
+            endObj.setHours(23, 59, 59, 999);
+
+            const filtered = appData.bills.filter(bill => {
+                const bDateObj = parseDate(bill.date);
+                if (isNaN(bDateObj.getTime())) return false;
+                return bDateObj >= startObj && bDateObj <= endObj;
+            });
+
+            if (filtered.length === 0) {
+                Swal.fire('ไม่พบข้อมูล', 'ไม่มีรายการบิลในช่วงวันที่เลือก', 'info');
+                return;
+            }
+
+            let totalBuy = 0;
+            let totalSell = 0;
+            let rowsHtml = '';
+
+            filtered.sort((a,b) => parseDate(a.date).getTime() - parseDate(b.date).getTime()).forEach(bill => {
+                const dObj = parseDate(bill.date);
+                const formattedDate = `${String(dObj.getDate()).padStart(2, '0')}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${dObj.getFullYear() + 543}`;
+                
+                const typeColor = bill.type === 'ซื้อเข้า' ? 'color: #16a34a;' : 'color: #2563eb;';
+                if (bill.type === 'ซื้อเข้า') totalBuy += parseFloat(bill.quantity) || 0;
+                if (bill.type === 'ขายออก') totalSell += parseFloat(bill.quantity) || 0;
+
+                rowsHtml += `
+                    <tr>
+                        <td class="text-center" style="border: 1px solid #000; padding: 8px 4px; white-space: nowrap;">${formattedDate}</td>
+                        <td class="text-center font-bold" style="${typeColor} border: 1px solid #000; padding: 8px 4px; white-space: nowrap;">${bill.type}</td>
+                        <td class="text-left" style="border: 1px solid #000; padding: 8px 4px; padding-left: 10px; white-space: nowrap;">${bill.name}</td>
+                        <td class="text-center" style="border: 1px solid #000; padding: 8px 4px; white-space: nowrap;">${bill.province}</td>
+                        <td class="text-right" style="border: 1px solid #000; padding: 8px 4px; padding-right: 10px; white-space: nowrap;">${parseFloat(bill.quantity).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td class="text-center" style="border: 1px solid #000; padding: 8px 4px;">${bill.remark || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            const printNow = new Date();
+            const printDateStr = `วันที่ ${printNow.getDate()} ${getThaiMonthName(printNow.getMonth() + 1)} ${printNow.getFullYear() + 543} เวลา ${String(printNow.getHours()).padStart(2, '0')}.${String(printNow.getMinutes()).padStart(2, '0')} น.`;
+            const docTitle = `SWK_Report_${startObj.getDate()}_${startObj.getMonth()+1}_${startObj.getFullYear()}__to__${endObj.getDate()}_${endObj.getMonth()+1}_${endObj.getFullYear()}`;
+
+            if (actionType === 'pdf') {
+                const pdfWindow = window.open('', '_blank');
+                if (pdfWindow) {
+                    pdfWindow.document.write('<div style="font-family: sans-serif; text-align: center; margin-top: 50px;">กำลังสร้างไฟล์ PDF และเตรียมหน้าปริ้น กรุณารอสักครู่...</div>');
+                } else {
+                    Swal.fire('แจ้งเตือน', 'เบราว์เซอร์บล็อกการเปิดแท็บใหม่ กรุณาอนุญาต Pop-up', 'warning');
+                    return;
+                }
+
+                showLoading(true, 'กำลังสร้างไฟล์ PDF...');
+                
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = `
+                    <style>
+                        .pdf-export-container { font-family: 'Sarabun', sans-serif; background: white; width: 210mm; min-height: 290mm; padding: 30mm 15mm 20mm 15mm; position: relative; color: #1f2937; box-sizing: border-box; }
+                        .pdf-export-container table { width: 100%; border-collapse: collapse; margin: 0 auto 20px auto; font-size: 13px; border: 1px solid #000; table-layout: fixed; }
+                        .pdf-export-container th { background-color: #d1d5db; color: #000; font-size: 14px; border: 1px solid #000; padding: 8px 4px; }
+                        .text-center { text-align: center; } .text-left { text-align: left; padding-left: 10px; } .text-right { text-align: right; padding-right: 10px; } .font-bold { font-weight: bold; }
+                    </style>
+                    <div class="pdf-export-container" id="pdf-export-container">
+                        <img src="https://i.postimg.cc/G4Jz0WDL/image.jpg" crossorigin="anonymous" style="position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 95%; max-width: 700px; opacity: 0.1; z-index: 0; pointer-events: none;" alt="watermark">
+                        <div style="position: relative; z-index: 1;">
+                            <h2 class="text-center font-bold" style="margin-bottom: 5px; font-size: 24px; color: #111827;">รายการสินค้า (SWK)</h2>
+                            <p class="text-center font-bold" style="color: #6b7280; margin-top: 0; margin-bottom: 30px; font-size: 16px;">บริษัท ศิวกรณ์ ค้าเกล็ดปลา จำกัด</p>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 13%;">วันที่</th>
+                                        <th style="width: 12%;">ประเภท</th>
+                                        <th style="width: 30%;">ชื่อลูกค้า/ผู้ขาย</th>
+                                        <th style="width: 14%;">แหล่งที่มา</th>
+                                        <th style="width: 14%;">จำนวน (KG)</th>
+                                        <th style="width: 17%;">หมายเหตุ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rowsHtml}</tbody>
+                            </table>
+                            <div style="display: flex; justify-content: flex-end; gap: 20px; margin-top: 15px; font-size: 15px;">
+                                <div style="padding: 12px 20px; background: #f9fafb; border: 1px solid #000; border-radius: 8px; font-weight: bold; color: #16a34a;">รวมซื้อเข้า: ${totalBuy.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} KG</div>
+                                <div style="padding: 12px 20px; background: #f9fafb; border: 1px solid #000; border-radius: 8px; font-weight: bold; color: #2563eb;">รวมขายออก: ${totalSell.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} KG</div>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; margin-top: 100px; font-size: 15px; padding-right: 15mm;">
+                                <div class="text-center" style="width: 250px;">
+                                    <div style="height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border: 1px dashed #000; border-radius: 8px; color: #000;">
+                                        ( พื้นที่ประทับตราบริษัท )
+                                    </div>
+                                    <p style="margin: 0;">ลงชื่อ ........................................................</p>
+                                    <p class="font-bold" style="margin: 10px 0 0 0;">( สุรินทร์ พันธุ์วิชาติกุล )</p>
+                                    <p style="margin: 10px 0 0 0; color: #6b7280;">................/....................../...............</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="position: absolute; bottom: 5mm; right: 15mm; font-size: 12px; color: #4b5563;">${printDateStr}</div>
+                    </div>
+                `;
+                
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.top = '0';
+                document.body.appendChild(tempDiv);
+
+                const element = document.getElementById('pdf-export-container');
+                const opt = {
+                    margin:       0,
+                    filename:     docTitle + '.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                setTimeout(() => {
+                    html2pdf().set(opt).from(element).toPdf().get('pdf').then(function(pdf) {
+                        pdf.autoPrint();
+                        const blobUrl = pdf.output('bloburl');
+                        pdfWindow.location.href = blobUrl;
+                        document.body.removeChild(tempDiv);
+                        showLoading(false);
+                        Swal.fire({ title: 'สำเร็จ!', text: 'ระบบกำลังแสดงพรีวิวและหน้าต่างปริ้น', icon: 'success', timer: 2000, showConfirmButton: false });
+                    }).catch(err => {
+                        console.error(err);
+                        if(pdfWindow) pdfWindow.close();
+                        document.body.removeChild(tempDiv);
+                        showLoading(false);
+                        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                    });
+                }, 1000);
+            }
+        }
+
+        // ==========================================
+        // UI Renderers
+        // ==========================================
         function renderProductionView() {
             const today = new Date().toDateString();
             const thisMonth = new Date().getMonth();
@@ -1060,9 +1719,68 @@
             }
         }
 
-        // Init Hash Detection
-        // Auto-open on load for Admin Dashboard
+        function renderBillTable() {
+            const tbody = document.getElementById('bill-table-body');
+            document.getElementById('total-records').innerText = `${appData.bills.length} รายการ`;
+
+            if (appData.bills.length === 0) {
+                tbody.innerHTML = `<tr class="block md:table-row"><td colspan="7" class="block md:table-cell p-8 text-center text-gray-400">ยังไม่มีข้อมูลบิลในระบบ</td></tr>`;
+                return;
+            }
+
+            appData.bills.sort((a, b) => {
+                const dateA = parseDate(a.date).getTime();
+                const dateB = parseDate(b.date).getTime();
+                if (dateA !== dateB) return dateB - dateA; 
+                return String(b.id).localeCompare(String(a.id));
+            });
+
+            tbody.innerHTML = '';
+            appData.bills.forEach((bill) => {
+                const dObj = parseDate(bill.date);
+                let formattedDate = bill.date; 
+                if(!isNaN(dObj.getTime())) {
+                    formattedDate = `${String(dObj.getDate()).padStart(2, '0')}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${dObj.getFullYear() + 543}`;
+                }
+
+                const typeBadge = bill.type === 'ซื้อเข้า' 
+                    ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-bold border border-green-200">ซื้อเข้า</span>`
+                    : `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-xs font-bold border border-blue-200">ขายออก</span>`;
+
+                const remarkHtml = bill.remark 
+                    ? `<span class="text-sm text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded border border-gray-200">${bill.remark}</span>` 
+                    : `<span class="text-gray-300">-</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors block md:table-row border border-gray-200 md:border-none rounded-xl md:rounded-none mb-4 md:mb-0 shadow-sm md:shadow-none bg-white text-sm';
+                
+                tr.innerHTML = `
+                    <td class="flex md:table-cell justify-between items-center p-3 md:p-4 text-right md:text-center border-b border-gray-50 md:border-none whitespace-nowrap text-gray-600 before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="วันที่">${formattedDate}</td>
+                    <td class="flex md:table-cell justify-between items-center p-3 md:p-4 text-right md:text-center border-b border-gray-50 md:border-none md:whitespace-nowrap before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="ประเภท">${typeBadge}</td>
+                    <td class="flex md:table-cell justify-between items-center p-3 md:p-4 text-right md:text-center border-b border-gray-50 md:border-none font-medium text-gray-800 md:whitespace-nowrap before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="ชื่อ">${bill.name}</td>
+                    <td class="flex md:table-cell justify-between items-center p-3 md:p-4 text-right md:text-center border-b border-gray-50 md:border-none text-gray-600 md:whitespace-nowrap before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="แหล่งที่มา">${bill.province}</td>
+                    <td class="flex md:table-cell justify-between items-center p-3 md:p-4 text-right md:text-center border-b border-gray-50 md:border-none text-gray-800 md:whitespace-nowrap before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="จำนวน">${parseFloat(bill.quantity).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} KG</td>
+                    <td class="flex md:table-cell justify-between items-center p-3 md:p-4 text-right md:text-center border-b border-gray-50 md:border-none before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="หมายเหตุ">${remarkHtml}</td>
+                    <td class="flex md:table-cell justify-between md:justify-center items-center p-3 md:p-4 border-b border-gray-50 md:border-none before:content-[attr(data-label)] before:font-bold before:text-gray-500 md:before:hidden" data-label="จัดการ">
+                        <div class="space-x-1 flex items-center">
+                            <button onclick="editBill('${bill.id}')" class="text-amber-500 hover:text-amber-600 hover:bg-amber-50 p-2 rounded-full transition" title="แก้ไขรายการ">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteBill('${bill.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition" title="ลบรายการ">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // Initialization
+        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
+            initBilling();
             openAdminModal();
         });
     </script>
